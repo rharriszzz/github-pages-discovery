@@ -4,3 +4,15 @@ __pycache__/
 .env
 .venv/
 .DS_Store
+
+# Defense-in-depth for accidental local YouTube imports; private data should live outside this repository.
+private/
+local-private/
+local-data/
+.secrets/
+client_secret*.json
+*oauth*token*.json
+token.json
+credentials.json
+*takeout*.zip
+*Takeout*.zip
