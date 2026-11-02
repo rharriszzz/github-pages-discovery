@@ -76,3 +76,11 @@ The Pages site is public: avoid committing anything you consider private. The sh
 - [Common Crawl statistics](https://commoncrawl.github.io/cc-crawl-statistics/plots/domains)
 
 See `RESEARCH_PLAN.md` for survey methodology and `CODEX_PROMPT.md` for the next development task.
+
+## Unified research direction (2026-11-02)
+
+This repository now has a **combined research plan** for (a) learning interests from public repositories and authorized YouTube data, (b) rediscovering older videos missing from available watch history, and (c) finding new relevant GitHub Pages sites and other research. Read [`MERGED_PROJECT_PLAN.md`](MERGED_PROJECT_PLAN.md) for the integrated architecture and [`CODEX_PROMPT.md`](CODEX_PROMPT.md) for the staged implementation instructions. The older [`RESEARCH_PLAN.md`](RESEARCH_PLAN.md) remains the detailed baseline for the public GitHub Pages sampling method.
+
+**Current implementation status:** The shipped code still implements only the original **public GitHub Pages pilot** (seven researched seed records). The merged YouTube importer, private history analysis, interest graph and lost-video recommendations are **planned, not yet implemented**. This note documents scope; it does not claim that private playlists are connected or that any Google account has been authorized.
+
+**Data-boundary rule:** All private playlist inventories, Likes, viewing-history exports, user-specific evidence, credentials and OAuth tokens must be stored outside the Git repository. The published `docs/` site contains only reviewed public-safe data. Personal YouTube analysis belongs in a private local application, not on GitHub Pages. 
