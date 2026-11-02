@@ -1,0 +1,18 @@
+{
+  "profile_name": "Public technical and creative interests; user-editable",
+  "notes": "Interest keywords are broad starting hypotheses, not personal-attribute inference. Review false positives and edit as needed.",
+  "interests": [
+    {"name": "Fluid dynamics and Navier–Stokes", "weight": 5, "terms": ["navier-stokes", "navier stokes", "vorticity", "vortex", "turbulence", "reynolds number", "fluid simulation", "pseudo-spectral", "taylor-green"]},
+    {"name": "Mathematics and mathematical physics", "weight": 5, "terms": ["vertex operator", "monstrous moonshine", "monster group", "modular forms", "borcherds", "general relativity", "kerr metric", "differential geometry", "lean 4", "formal proof"]},
+    {"name": "AI for mathematics and science", "weight": 5, "terms": ["ai for mathematics", "automated theorem proving", "scientific discovery", "neural operator", "machine learning", "deep learning", "reinforcement learning", "foundation model"]},
+    {"name": "Reversi and game-playing engines", "weight": 5, "terms": ["reversi", "othello", "alpha-beta", "alpha beta", "minimax", "edax", "bitboard", "evaluation function", "game engine"]},
+    {"name": "Computational imaging and geometry", "weight": 4, "terms": ["computer vision", "fft", "fourier transform", "inverse rendering", "3d reconstruction", "photogrammetry", "pov-ray", "image processing", "pattern recognition"]},
+    {"name": "Bead crochet and textile geometry", "weight": 4, "terms": ["bead crochet", "crochet", "beading", "bracelet pattern", "bead pattern", "weaving", "helical pattern"]},
+    {"name": "Music transcription and notation", "weight": 5, "terms": ["piano transcription", "music transcription", "automatic music transcription", "piano roll", "sheet music", "midi transcription", "music information retrieval"]},
+    {"name": "Mechanical music and physical computing", "weight": 4, "terms": ["music box", "music disc", "laser cutting", "dxf", "mechanical music", "piano mechanism", "computer aided design"]},
+    {"name": "Space systems and orbital computing", "weight": 5, "terms": ["orbital data center", "orbital compute", "radiator", "solar array", "spacecraft", "sun-synchronous", "thermal management", "satellite constellation", "data center"]},
+    {"name": "Systems programming and performance", "weight": 3, "terms": ["profiling", "benchmark", "runtime dispatch", "simd", "wasm", "webassembly", "c++", "rust", "high performance computing", "optimization"]},
+    {"name": "Interactive scientific explanation", "weight": 3, "terms": ["interactive simulation", "interactive visualization", "physical simulation", "visual explanation", "numerical methods", "scientific computing"]},
+    {"name": "Cooking and recipe publishing", "weight": 2, "terms": ["recipe", "cooking", "food science", "recipe collection"]}
+  ]
+}

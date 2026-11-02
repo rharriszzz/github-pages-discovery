@@ -1,0 +1,11 @@
+# A bounded, topic-biased sample. GitHub repository search is NOT a census.
+# Avoid running thousands of searches without rate-budgeting and checkpoints.
+github.io in:name
+navier-stokes in:name,description
+reversi in:name,description
+music transcription in:name,description
+vertex operator in:name,description
+fluid simulation in:name,description
+orbital computing in:name,description
+bead pattern in:name,description
+# Add an unrelated/randomized discovery strategy in the next phase to measure recall and selection bias.

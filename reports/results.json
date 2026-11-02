@@ -1,0 +1,374 @@
+[
+  {
+    "url": "https://cpoli.github.io/physicskit/api/gallery/fluids/navier_stokes/index.html",
+    "owner": "cpoli",
+    "account_type": "User",
+    "account_type_source": "GitHub repository owner.type checked 2026-11-02",
+    "repository": "cpoli/physicskit",
+    "repo_url": "https://github.com/cpoli/physicskit",
+    "repo_description": "Scientific computing examples of pseudo-spectral incompressible Navier–Stokes, turbulence and vortex decay.",
+    "topics": [],
+    "language": "",
+    "stars": 0,
+    "updated_at": "",
+    "source": "manual research sample, 2026-11-02",
+    "site_status": "research_preview",
+    "title": "Navier–Stokes and turbulence gallery",
+    "summary": "Scientific computing examples of pseudo-spectral incompressible Navier–Stokes, turbulence and vortex decay.",
+    "body": "",
+    "review": "Page and account inspected through live research tools; automatic HTTP crawler not yet run.",
+    "score": 28,
+    "interests": [
+      "Fluid dynamics and Navier–Stokes",
+      "Interactive scientific explanation"
+    ],
+    "evidence": [
+      {
+        "topic": "Fluid dynamics and Navier–Stokes",
+        "points": 24,
+        "matches": [
+          {
+            "term": "vortex",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "turbulence",
+            "evidence": [
+              "title",
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "pseudo-spectral",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          }
+        ]
+      },
+      {
+        "topic": "Interactive scientific explanation",
+        "points": 4,
+        "matches": [
+          {
+            "term": "scientific computing",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://fir3n0x.github.io/projects/",
+    "owner": "Fir3n0x",
+    "account_type": "User",
+    "account_type_source": "GitHub repository owner.type checked 2026-11-02",
+    "repository": "Fir3n0x/Fir3n0x.github.io",
+    "repo_url": "https://github.com/Fir3n0x/Fir3n0x.github.io",
+    "repo_description": "Reversi and Othello project collection, minimax, alpha-beta game search, evaluation functions and a board-game domain-specific language.",
+    "topics": [],
+    "language": "",
+    "stars": 0,
+    "updated_at": "",
+    "source": "manual research sample, 2026-11-02",
+    "site_status": "research_preview",
+    "title": "OthelloAI and Reversi projects",
+    "summary": "Reversi and Othello project collection, minimax, alpha-beta game search, evaluation functions and a board-game domain-specific language.",
+    "body": "",
+    "review": "Page and account inspected through live research tools; automatic HTTP crawler not yet run.",
+    "score": 26,
+    "interests": [
+      "Reversi and game-playing engines"
+    ],
+    "evidence": [
+      {
+        "topic": "Reversi and game-playing engines",
+        "points": 26,
+        "matches": [
+          {
+            "term": "reversi",
+            "evidence": [
+              "title",
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "othello",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "alpha-beta",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "minimax",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://syntagmatic.github.io/moonshine/modular-forms/13-vertex-operators-and-moonshine-module.html",
+    "owner": "syntagmatic",
+    "account_type": "User",
+    "account_type_source": "GitHub repository owner.type checked 2026-11-02",
+    "repository": "syntagmatic/moonshine",
+    "repo_url": "https://github.com/syntagmatic/moonshine",
+    "repo_description": "Monstrous moonshine, modular forms, Monster group, vertex operator algebras and Borcherds-related mathematics.",
+    "topics": [],
+    "language": "",
+    "stars": 0,
+    "updated_at": "",
+    "source": "manual research sample, 2026-11-02",
+    "site_status": "research_preview",
+    "title": "Vertex Operators and the Moonshine Module",
+    "summary": "Monstrous moonshine, modular forms, Monster group, vertex operator algebras and Borcherds-related mathematics.",
+    "body": "",
+    "review": "Page and account inspected through live research tools; automatic HTTP crawler not yet run.",
+    "score": 26,
+    "interests": [
+      "Mathematics and mathematical physics"
+    ],
+    "evidence": [
+      {
+        "topic": "Mathematics and mathematical physics",
+        "points": 26,
+        "matches": [
+          {
+            "term": "vertex operator",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "monstrous moonshine",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "monster group",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "modular forms",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "borcherds",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://dogum.github.io/artifact-shelf/a/orbital-data-center/",
+    "owner": "dogum",
+    "account_type": "User",
+    "account_type_source": "GitHub repository owner.type checked 2026-11-02",
+    "repository": "dogum/artifact-shelf",
+    "repo_url": "https://github.com/dogum/artifact-shelf",
+    "repo_description": "Isometric orbital data-center concept with solar arrays, radiators, thermal management, coolant loops and satellite hardware.",
+    "topics": [],
+    "language": "",
+    "stars": 0,
+    "updated_at": "",
+    "source": "manual research sample, 2026-11-02",
+    "site_status": "research_preview",
+    "title": "Orbital Compute Node",
+    "summary": "Isometric orbital data-center concept with solar arrays, radiators, thermal management, coolant loops and satellite hardware.",
+    "body": "",
+    "review": "Page and account inspected through live research tools; automatic HTTP crawler not yet run.",
+    "score": 18,
+    "interests": [
+      "Space systems and orbital computing"
+    ],
+    "evidence": [
+      {
+        "topic": "Space systems and orbital computing",
+        "points": 18,
+        "matches": [
+          {
+            "term": "orbital compute",
+            "evidence": [
+              "title"
+            ]
+          },
+          {
+            "term": "thermal management",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://oddurs.github.io/fluidity/",
+    "owner": "oddurs",
+    "account_type": "User",
+    "account_type_source": "GitHub repository owner.type checked 2026-11-02",
+    "repository": "oddurs/fluidity",
+    "repo_url": "https://github.com/oddurs/fluidity",
+    "repo_description": "Browser fluid playground demonstrating vortex streets, vorticity, pressure and wing flow, including numerical limitations.",
+    "topics": [],
+    "language": "",
+    "stars": 0,
+    "updated_at": "",
+    "source": "manual research sample, 2026-11-02",
+    "site_status": "research_preview",
+    "title": "FLUIDITY — Navier–Stokes playground",
+    "summary": "Browser fluid playground demonstrating vortex streets, vorticity, pressure and wing flow, including numerical limitations.",
+    "body": "",
+    "review": "Page and account inspected through live research tools; automatic HTTP crawler not yet run.",
+    "score": 14,
+    "interests": [
+      "Fluid dynamics and Navier–Stokes"
+    ],
+    "evidence": [
+      {
+        "topic": "Fluid dynamics and Navier–Stokes",
+        "points": 14,
+        "matches": [
+          {
+            "term": "vorticity",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          },
+          {
+            "term": "vortex",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://opensbli.github.io/applications/",
+    "owner": "opensbli",
+    "account_type": "Organization",
+    "account_type_source": "GitHub repository owner.type checked 2026-11-02",
+    "repository": "opensbli/OpenSBLI",
+    "repo_url": "https://github.com/opensbli/OpenSBLI",
+    "repo_description": "Computational fluid dynamics applications featuring Taylor–Green vortices, shock tubes, turbulence and numerical methods.",
+    "topics": [],
+    "language": "",
+    "stars": 0,
+    "updated_at": "",
+    "source": "manual research sample, 2026-11-02",
+    "site_status": "research_preview",
+    "title": "OpenSBLI applications",
+    "summary": "Computational fluid dynamics applications featuring Taylor–Green vortices, shock tubes, turbulence and numerical methods.",
+    "body": "",
+    "review": "Page and account inspected through live research tools; automatic HTTP crawler not yet run.",
+    "score": 12,
+    "interests": [
+      "Fluid dynamics and Navier–Stokes",
+      "Interactive scientific explanation"
+    ],
+    "evidence": [
+      {
+        "topic": "Fluid dynamics and Navier–Stokes",
+        "points": 8,
+        "matches": [
+          {
+            "term": "turbulence",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          }
+        ]
+      },
+      {
+        "topic": "Interactive scientific explanation",
+        "points": 4,
+        "matches": [
+          {
+            "term": "numerical methods",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://build-me-anything.github.io/",
+    "owner": "Build-Me-Anything",
+    "account_type": "Organization",
+    "account_type_source": "GitHub repository owner.type checked 2026-11-02",
+    "repository": "build-me-anything/build-me-anything.github.io",
+    "repo_url": "https://github.com/build-me-anything/build-me-anything.github.io",
+    "repo_description": "Numerical vortex experiments, Taylor–Green flows, Reynolds numbers, resolution studies and the difference between simulation and proof.",
+    "topics": [],
+    "language": "",
+    "stars": 0,
+    "updated_at": "",
+    "source": "manual research sample, 2026-11-02",
+    "site_status": "research_preview",
+    "title": "NSLab — a Navier–Stokes logbook",
+    "summary": "Numerical vortex experiments, Taylor–Green flows, Reynolds numbers, resolution studies and the difference between simulation and proof.",
+    "body": "",
+    "review": "Page and account inspected through live research tools; automatic HTTP crawler not yet run.",
+    "score": 8,
+    "interests": [
+      "Fluid dynamics and Navier–Stokes"
+    ],
+    "evidence": [
+      {
+        "topic": "Fluid dynamics and Navier–Stokes",
+        "points": 8,
+        "matches": [
+          {
+            "term": "vortex",
+            "evidence": [
+              "description",
+              "repository"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
