@@ -1,34 +1,67 @@
-# Prompt for Codex: GitHub Pages Interest Finder — expand and verify the pilot
+# Codex task: unified interest discovery and lost-YouTube-video recovery
 
-You are working in my **new** repository, `rharriszzz/github-pages-discovery`. It contains a working Python standard-library-only starter implementation. My main goal is to discover interesting `x.github.io` websites, find out whether each is owned by a GitHub **User** or **Organization** account, and learn whether the site's and owner's interests overlap my own. I am more interested in **discovering genuinely worthwhile research and engineering projects** than in a superficial numerical popularity leaderboard.
+**Authoritative design:** Read [`MERGED_PROJECT_PLAN.md`](MERGED_PROJECT_PLAN.md) completely before coding. This replaces the earlier separate prompts for interest modeling, YouTube importing, and forgotten-video recovery. Do **not** concatenate or separately implement those prompts. The original [`RESEARCH_PLAN.md`](RESEARCH_PLAN.md) remains the reference for the GitHub Pages sampling experiment.
 
-**Read** `README.md`, `RESEARCH_PLAN.md`, `data/interests.json`, the sample `data/sites.json`, all of `pagefinder/`, and the tests first. Review existing code for bugs; do not assume the starter implementation is production-ready. Do not throw away its auditable output, manually curated sample, or human-review fields.
+## Mission
 
-## Phase 1: validate and harden the included implementation
+Improve `rharriszzz/github-pages-discovery` into a single evidence-driven research tool that (1) learns my sustained intellectual interests from my public GitHub repositories and, with my authorization, YouTube playlists/Likes/history, (2) finds older public YouTube uploads I plausibly missed from channels I used to value, and (3) finds new relevant websites, projects, creators and adjacent subject areas.
 
-1. Run the unit tests and offline report. Examine the sample output in `docs/index.html`. Verify the seven sample site URLs and associated GitHub accounts, including `owner.type`; flag any mismatches. Improve tests for URL/redirect safety, escaped HTML, `robots.txt`, pagination, API errors, and cached/offline behavior.
-2. Confirm the GitHub API search syntax, existence checks and actual site-source repository mapping. A project with `has_pages=true` may deploy to a custom domain; never silently treat a guessed `owner.github.io/repository/` as confirmed. Treat redirect/soft-404/stale-content cases explicitly. Maintain provenance for manual and automated classifications and never overwrite human review labels.
-3. Do a **small** authenticated and rate-budgeted test run (prefer existing `gh auth` context; never ask me to paste credentials or save a token), first around 20, then a bounded 100 sites. Check actual GitHub rate-limit headers and search endpoint policies. Stop on 403/429 and respect `Retry-After` and reset times; no evasion or excessive concurrency. Do not claim a URL is a live site without successful independent verification.
-4. Audit the HTML parser, content limits and polite crawling. Never execute external scripts. Respect `robots.txt`; never crawl off-domain or scrape emails/phone numbers, private data, or security-sensitive content. Keep requests modest and cache/checkpoint each batch.
+**Common core:** stable IDs, provenance, engagement observations, interest/concept graph, review feedback, storage/checkpointing, privacy separation, and transparent ranking facets. **Separate retrieval strategies:** catalog gaps among *known creators* versus open-ended discovery of *new material*. They must share the core, not duplicate implementations.
 
-## Phase 2: design a defensible discovery strategy
+The 2025 YouTube discussion is important: forgotten channels, monthly/yearly watching histograms, publication-to-discovery lag, series gaps, and exploring partial watches if playback-completion data legitimately exists. Do **not** fabricate viewing minutes or 50%/95% completion from Takeout history timestamps. A video not found in an incomplete export is not necessarily unwatched.
 
-5. The internet contains many `*.github.io` sites, and GitHub's search API is **not an exhaustive directory**. Research better ways to discover candidate hosts: GitHub repo search, published Common Crawl indices/datasets, public link discovery, etc. Compare yield, bias, source legitimacy, compute/network cost and rate limiting. Avoid claiming an exhaustive census or an unbiased estimate without an actual sampling design.
-6. Build two explicitly separate cohorts: (A) a broad and partially topic-agnostic sample for understanding who publishes sites and (B) an interest-targeted cohort for finding the best matches. Record denominator, date, query, page/search truncation, deduplicated hosts and whether a site was actually reachable. Include organizations and individuals without optimizing exclusively for one category.
-7. Group related project pages under owner accounts to avoid letting prolific owners dominate. A GitHub `User` account does not prove a lone maintainer; an `Organization` may comprise one person. Distinguish **account type**, **actual site project**, **apparent maintainer/team (if explicitly documented)** and **owner portfolio interest**.
+## Before editing
 
-## Phase 3: make matching intellectually useful
+1. Inspect working tree, branch, recent commits, `README.md`, `RESEARCH_PLAN.md`, `MERGED_PROJECT_PLAN.md`, `data/interests.json`, current source, tests, `docs/`, and GitHub Pages Actions. Retain existing sample data, human labels and generated public catalog.
+2. Run baseline tests and offline report. Confirm API features/limits against up-to-date official documentation, especially YouTube private playlist OAuth, `videos.list(myRating=like)` 1,000-result bound, unsupported Watch Later/History access, and channel uploads playlist.
+3. Identify any Codex work on other branches or uncommitted local files; integrate rather than overwrite. If current local state differs from what the plan assumes, record the differences.
 
-8. Begin with the editable interest profile: Navier–Stokes and physically interesting CFD; numerical verification and Reynolds number questions; mathematics/VOAs/Monster and formal methods; AI scientific discoveries; Reversi search and learned evaluation; image reconstruction and bead crochet; music transcription and physical music boxes; space-based datacenters and thermal engineering; systems programming; recipes and other creative work.
-9. Do not reward mere keyword repetition. Distinguish **direct topical overlap**, **shared tools/methods**, **potentially useful adjacent discoveries**, and **novel material I might enjoy**. For each high-ranked finding, give two or three concrete reasons with links to pages, README files or actual examples, plus a clear caution if evidence is weak. A website title alone is not adequate evidence.
-10. Add human review statuses (`keep`, `skip`, `later`, `uncertain`), notes and suppression of low-quality duplicates/abandoned clones. Calibrate top-result precision with a manually labeled mixed sample. Report false positives and areas with poor coverage, not just success cases.
-11. Compare project quality where relevant: scientific rigor and numerical validation, reproducibility, educational clarity, novelty, code accessibility, and maintained status. Keep these separate from topic similarity. Do not equate popularity, stars or slick design with scientific value.
+## Stage 1 — build the shared foundations now
 
-## Phase 4: outputs and GitHub Pages
+- Write a small, testable, versioned schema for public entities, private observations, evidence/provenance, concepts/relationships and recommendations. Store private user records under a configurable folder **outside** the Git working tree. Keep the public pagefinder implementation working.
+- Add explicit completeness states, confidence/uncertainty, historical title/ID handling, persisted manual reviews, checkpoints, bounded retries, and test fixtures.
+- Test for accidental inclusion of OAuth secrets or private data in exported `docs/` content; don't merely rely on `.gitignore`.
+- Provide an implementation-status report distinguishing implemented functions from designs and unsupported metrics.
+- Keep the public Pages site public-safe and the personal YouTube dashboard local to WSL2/localhost.
 
-12. Improve the light-background static catalog in `docs/` with filters for topic, owner type, project vs homepage, review status and discovery source. Each result must link to both its live website and its source repository when verifiable. Preserve CSV/JSON for analysis. This website itself can be published on GitHub Pages once I choose that setting.
-13. Produce `reports/methodology.md`, `reports/coverage.md`, `reports/findings.md`, and `reports/interesting-sites.md`, documenting date, exact query frames, rate limits, sample bias, account-type distribution **within each specific sample**, and the strongest matches worth reading. Clearly label what is verified and what is inferred.
-14. Keep a checkpoint/resume workflow. Do not schedule uncontrolled GitHub Actions crawls, create recurring automations, or push secrets. The site deployment must only publish the checked-in static `docs` artifact.
-15. Run tests, inspect the generated site, resolve obvious failures and commit/push the work to `main` only when the report and tests are consistent. Record what actually ran and what was deferred. If an API, service, or rate limit blocks progress, checkpoint everything and continue with useful offline work, then report the blocker plainly.
+## Stage 2 — the first user-visible milestone: playlist names
 
-**Important judgment:** Favor a reliable, transparent survey of perhaps a few hundred or thousand websites over grand claims to have enumerated the whole domain. If a particular approach isn't yielding genuinely new and interesting sites, diagnose the failure and change the discovery strategy. Include unexpected but interesting neighboring research areas, not just exact matches for the words in my profile.
+Implement a Python CLI to authenticate with the YouTube Data API using a read-only Desktop OAuth client that the user will obtain in Google Cloud Console. Assume WSL2 Linux user `rharris`, Windows Chrome available, and credentials in:
+
+`~/.config/github-pages-discovery/youtube/client_secret.json`
+
+Use `https://www.googleapis.com/auth/youtube.readonly`. Handle WSL2 loopback-browser authorization carefully. Never request or store a password; no tokens or private data in Git. Respect quota and pagination.
+
+**First retrieve only every accessible user-created playlist's title, ID, privacy, description and count**, including private playlists. Also clearly report which system collections (Likes, Watch Later, History) do not support the same enumeration path. Save a **local-only** editable playlist-inventory report, with purpose/relevance labels the user can correct. Do not import thousands of videos yet.
+
+If no credentials are present, provide clear setup instructions and stop at an offline-tested importer. Do not block unrelated code/tests while awaiting sign-in. Do **not** ask for screenshots of very large playlists.
+
+## Stage 3 — import history and prove lost-video discovery
+
+- Support Google Takeout formats for Watch History and, where present, Likes, playlists and Watch Later. Parse cautiously, with versioned/synthetic fixtures and an import completeness report. API Likes are limited to the most recent 1,000 returned items.
+- After I review the playlist inventory, import chosen playlist contents, normalize videos/channels and create engagement observations. A saved item is not proof of a play; Watch Later means intent, not completion.
+- For a pilot of **3–5 high-affinity YouTube channels**, retrieve currently accessible uploads with the channel's uploads playlist; compare publication chronology to the locally available history and saved/liked videos. Demonstrate missed-item gaps surrounded by watched items and formerly frequent channels now encountered less often.
+- Make a **private local** browser viewer for producer timelines, monthly/yearly watch-event and distinct-video counts, first-view versus publication lag, candidate queues and evidence/confidence. Only show estimated watch minutes when evidence really supports them. Keep meaningful user-review feedback.
+- Evaluate at least ten candidates with explicit false-positive and missing-data accounting before crawling large numbers of channels.
+
+## Stage 4 — use that profile to improve public discovery
+
+Study my public repositories, including relevant non-default branches, to populate subject/method/question relationships. Integrate only vetted and private-safe summaries of YouTube-derived interest signals. Maintain a keyword-only comparator and test whether graph expansion actually improves discovery.
+
+Then harden the original GitHub Pages discovery, validate ~20 sites and a bounded ~100-site diverse sample, and produce the original owner-type, coverage, bias, and interesting-site reports. Keep public/site rankings separate from private missed-video rankings, each with explanations, multiple scoring facets, and evidence.
+
+## Execution rules
+
+- Work in coherent increments, with local tests and checkpoints before each external/API batch; no uncontrolled crawls or rate-limit evasion.
+- Aim for a useful, reviewable milestone rather than a large count. Record exactly what has run, including request totals or quotas, dataset coverage, and unavailable sources.
+- Keep raw user data, credentials, OAuth tokens and private reports outside the repository and all Pages artifacts. Do not expose playlist membership indirectly via public scores/examples or filenames.
+- Honor robots.txt and GitHub API limits for external sites; use public API endpoints for YouTube where allowed. No automatic playback, no YouTube history writes, no unrequested scheduling.
+- Tests should cover data isolation, schema migration, pagination, duplicate IDs, unavailable videos, time-zone handling, chronology gaps, missing history, cached/offline reruns, and static output safety.
+- Preserve working `pagefinder` features, their test coverage and the existing seven examples.
+- Commit/push verified public code and documentation only; leave raw YouTube data on the user's PC. Explain any outstanding user action required for Google authorization.
+
+## First deliverable / stop point
+
+Before a large crawl, produce a **privacy-safe local YouTube playlist inventory**, a reusable public/private data architecture, an offline-tested history importer, and an updated implementation-status report. Request the user's playlist-purpose annotations and/or Google credentials when truly necessary. The broader historical analysis and public discovery phases follow those gates; don't start by importing every video or creating a massive taxonomy.
+
+The operating question is not "How many results did we classify?" but: **"Did we find worthwhile old videos I would have missed, and genuinely interesting new ideas I didn't already know about?"**
