@@ -7,6 +7,8 @@ from .core import ROOT, rank_all
 
 
 def render():
+    from .publication import validate_public_inputs
+    validate_public_inputs()
     rows = rank_all()
     docs, reports = ROOT / 'docs', ROOT / 'reports'
     docs.mkdir(exist_ok=True)

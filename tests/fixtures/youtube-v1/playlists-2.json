@@ -1,0 +1,4 @@
+{"etag":"synthetic-page-2","items":[
+{"id":"PLsynthetic1","snippet":{"title":"Synthetic renamed favorites","description":"Duplicate ID across pages","channelId":"UCaaaaaaaaaaaaaaaaaaaaaa"},"contentDetails":{"itemCount":12001},"status":{"privacyStatus":"private"}},
+{"id":"PLsynthetic3","snippet":{"title":"Synthetic public playlist","description":"Public visibility does not make membership public-safe","channelId":"UCaaaaaaaaaaaaaaaaaaaaaa"},"contentDetails":{"itemCount":2},"status":{"privacyStatus":"public"}}
+]}

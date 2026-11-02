@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import hashlib
 import html
+import io
 from html.parser import HTMLParser
 import json
 import os
@@ -17,6 +18,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.robotparser import RobotFileParser
+from .net import BudgetExceeded, NetworkState
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'sites.json'
@@ -31,6 +33,21 @@ class ApiError(Exception):
 
 class RateLimited(ApiError):
     pass
+
+
+class GitHubRedirects(HTTPRedirectHandler):
+    max_redirections = 3
+
+    def __init__(self, admit):
+        self.admit = admit
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        parsed = urlsplit(newurl)
+        if (parsed.scheme != 'https' or parsed.hostname != 'api.github.com' or
+                parsed.username or parsed.password or parsed.port):
+            raise ApiError('GitHub redirect outside the API was not followed')
+        self.admit(parsed.path)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def load_json(path: Path, fallback):
@@ -81,6 +98,16 @@ class GitHubClient:
         self.last_request = 0.0
         self.cache_dir = ROOT / '.cache' / 'github'
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+        self.network = NetworkState(ROOT / '.cache' / 'http.sqlite3')
+
+    def _admit(self, path):
+        try:
+            if path.startswith('/search/'):
+                self.network.admit('github_search', interval=max(self.delay, 6.1), window=60, limit=10)
+            self.network.admit('github_core', interval=max(self.delay, 1.0), window=3600,
+                               limit=5000 if self.token else 60)
+        except BudgetExceeded as exc:
+            raise RateLimited(str(exc)) from None
 
     def get(self, path: str, params: dict | None = None):
         url = 'https://api.github.com' + path
@@ -88,10 +115,16 @@ class GitHubClient:
             url += '?' + urlencode(params)
         key = hashlib.sha256(url.encode()).hexdigest()
         fp = self.cache_dir / f'{key}.json'
+        cached = self.network.cached(url)
+        if cached and cached['status'] == 200 and (self.offline or
+                time.time() - cached['fetched'] < self.cache_days * 86400):
+            return cached['body']
         if fp.exists() and (self.offline or time.time() - fp.stat().st_mtime < self.cache_days * 86400):
             return load_json(fp, {})
         if self.offline:
             raise ApiError(f'Not cached (offline): {path}')
+        # Search shares core accounting; redirects also pass through admission.
+        self._admit(path)
         wait = self.delay - (time.monotonic() - self.last_request)
         if wait > 0:
             time.sleep(wait)
@@ -100,14 +133,28 @@ class GitHubClient:
         if self.token:
             headers['Authorization'] = 'Bearer ' + self.token
         try:
-            with build_opener().open(Request(url, headers=headers), timeout=20) as res:
+            with build_opener(GitHubRedirects(self._admit)).open(Request(url, headers=headers), timeout=20) as res:
                 self.last_request = time.monotonic()
                 body = res.read(2_000_000)
                 data = json.loads(body)
+                self.network.save(url, res.status, dict(res.headers), data)
+                self.network.response_limits('github_core', res.status, dict(res.headers))
+                if path.startswith('/search/'):
+                    self.network.response_limits('github_search', res.status, dict(res.headers))
                 save_json(fp, data)
                 return data
         except HTTPError as e:
             self.last_request = time.monotonic()
+            try:
+                error_body = json.loads(e.read(100_000))
+            except (ValueError, OSError):
+                error_body = {'error': 'Unparseable error response'}
+            finally:
+                e.close()
+            self.network.save(url, e.code, dict(e.headers), error_body)
+            self.network.response_limits('github_core', e.code, dict(e.headers))
+            if path.startswith('/search/'):
+                self.network.response_limits('github_search', e.code, dict(e.headers))
             remaining = e.headers.get('X-RateLimit-Remaining', '?')
             reset = e.headers.get('X-RateLimit-Reset', '?')
             retry = e.headers.get('Retry-After', '?')
@@ -219,22 +266,73 @@ class PageText(HTMLParser):
 
 
 class NoExternalRedirects(HTTPRedirectHandler):
+    max_redirections = 3
+
+    def __init__(self, before_redirect=None):
+        self.before_redirect = before_redirect
+
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         if not safe_site(newurl):
             raise HTTPError(newurl, code, 'Non-GitHub-Pages redirect not followed', headers, fp)
+        if self.before_redirect:
+            self.before_redirect(newurl)
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 class PageFetcher:
     def __init__(self, delay: float = 1.0, offline: bool = False):
         self.delay, self.offline = delay, offline
-        self.opener = build_opener(NoExternalRedirects)
+        self.network = NetworkState(ROOT / '.cache' / 'http.sqlite3')
+        self.opener = build_opener(NoExternalRedirects(self._reserve))
         self.last = 0.0
         self.robots = {}
         self.cache_dir = ROOT / '.cache' / 'pages'
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def fetch(self, url: str) -> dict:
+        result = self._fetch(url)
+        if safe_site(url):
+            key = hashlib.sha256(url.encode()).hexdigest()
+            # Include failures rather than silently forgetting excluded candidates.
+            path = self.cache_dir / (key + '.json')
+            if result.get('site_status') != 'not_cached' and (not path.exists() or
+                    load_json(path, {}) != result or time.time() - path.stat().st_mtime >= 2 * 86400):
+                save_json(path, result)
+        return result
+
+    def _reserve(self, url):
+        try:
+            self.network.admit('sites_global', interval=max(self.delay, 1.0), window=3600, limit=500)
+            self.network.admit('site:' + str(urlsplit(url).hostname),
+                               interval=max(self.delay, 2.0), window=3600, limit=100)
+        except BudgetExceeded as exc:
+            raise RateLimited(str(exc)) from None
+
+    def _open(self, url, limit, timeout):
+        # Cache raw bounded responses for reproducibility, including robots and errors.
+        cached = self.network.cached(url)
+        if cached and time.time() - cached['fetched'] < 2 * 86400:
+            raw = cached['body']['raw'].encode()
+            if cached['status'] != 200:
+                raise HTTPError(url, cached['status'], 'Cached response', cached['headers'], io.BytesIO(raw))
+            return raw, cached['headers']
+        self._reserve(url)
+        try:
+            res = self.opener.open(Request(url, headers={'User-Agent': USER_AGENT,
+                                                        'Accept': 'text/html,text/plain'}), timeout=timeout)
+        except HTTPError as exc:
+            self.network.save(url, exc.code, dict(exc.headers),
+                              {'raw': exc.read(min(limit, 100_000)).decode('utf-8', 'replace')})
+            self.network.response_limits('site:' + str(urlsplit(url).hostname), exc.code, dict(exc.headers))
+            self.network.response_limits('sites_global', exc.code, dict(exc.headers))
+            raise
+        with res:
+            raw = res.read(limit + 1)
+            self.network.save(url, res.status, dict(res.headers), {'raw': raw.decode('utf-8', 'replace')})
+            self.network.response_limits('site:' + str(urlsplit(url).hostname), res.status, dict(res.headers))
+            return raw, res.headers
+
+    def _fetch(self, url: str) -> dict:
         if not safe_site(url):
             return {'site_status': 'rejected_url'}
         key = hashlib.sha256(url.encode()).hexdigest()
@@ -249,8 +347,8 @@ class PageFetcher:
             robots_url = f'https://{host}/robots.txt'
             try:
                 self._delay()
-                with self.opener.open(Request(robots_url, headers={'User-Agent': USER_AGENT}), timeout=12) as res:
-                    rp.parse(res.read(40_000).decode('utf-8', 'replace').splitlines())
+                raw, _ = self._open(robots_url, 40_000, 12)
+                rp.parse(raw.decode('utf-8', 'replace').splitlines())
             except HTTPError as e:
                 if e.code == 404:
                     rp.parse([])
@@ -267,19 +365,17 @@ class PageFetcher:
             return {'site_status': 'robots_disallowed'}
         try:
             self._delay()
-            with self.opener.open(Request(url, headers={'User-Agent': USER_AGENT,
-                                                        'Accept': 'text/html'}), timeout=18) as res:
-                if 'text/html' not in res.headers.get('Content-Type', '').lower():
-                    return {'site_status': 'non_html'}
-                raw = res.read(MAX_HTML_BYTES + 1)
-                if len(raw) > MAX_HTML_BYTES:
-                    return {'site_status': 'too_large'}
-                parser = PageText()
-                parser.feed(raw.decode('utf-8', 'replace'))
-                data = dict(site_status='ok', title=' '.join(parser.title_parts)[:200],
-                            summary=parser.description, body=' '.join(parser.text_parts)[:12_000])
-                save_json(fp, data)
-                return data
+            raw, headers = self._open(url, MAX_HTML_BYTES, 18)
+            if 'text/html' not in (headers.get('Content-Type') or headers.get('content-type', '')).lower():
+                return {'site_status': 'non_html'}
+            if len(raw) > MAX_HTML_BYTES:
+                return {'site_status': 'too_large'}
+            parser = PageText()
+            parser.feed(raw.decode('utf-8', 'replace'))
+            data = dict(site_status='ok', title=' '.join(parser.title_parts)[:200],
+                        summary=parser.description, body=' '.join(parser.text_parts)[:12_000])
+            save_json(fp, data)
+            return data
         except HTTPError as e:
             return {'site_status': f'http_{e.code}'}
         except (URLError, TimeoutError, UnicodeError, ValueError):
@@ -308,6 +404,9 @@ def enrich(max_sites: int = 50, offline: bool = False, refresh_owners: bool = Tr
                 profile = api.get('/users/' + quote(r['owner']))
                 r['account_type'] = profile.get('type', 'Unknown')
                 r['account_type_source'] = 'GitHub GET /users/{owner} type'
+            except RateLimited:
+                save_json(DB, rows)
+                raise
             except ApiError:
                 pass
         r.update(fetcher.fetch(r['url']))

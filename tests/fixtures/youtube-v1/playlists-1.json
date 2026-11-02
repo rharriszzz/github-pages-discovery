@@ -1,0 +1,4 @@
+{"etag":"synthetic-page-1","nextPageToken":"synthetic-next","items":[
+{"id":"PLsynthetic1","snippet":{"title":"Synthetic favorites","description":"A synthetic private collection","channelId":"UCaaaaaaaaaaaaaaaaaaaaaa"},"contentDetails":{"itemCount":12000},"status":{"privacyStatus":"private"}},
+{"id":"PLsynthetic2","snippet":{"title":"Synthetic queue","description":"Intent only","channelId":"UCaaaaaaaaaaaaaaaaaaaaaa"},"contentDetails":{"itemCount":25},"status":{"privacyStatus":"unlisted"}}
+]}

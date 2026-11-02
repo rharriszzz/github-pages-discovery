@@ -1,0 +1,8 @@
+[
+  {"title":"Watched Synthetic first video","titleUrl":"https://www.youtube.com/watch?v=aaaaaaaaaaa","time":"2024-03-01T23:30:00-05:00","subtitles":[{"name":"Synthetic creator","url":"https://www.youtube.com/channel/UCaaaaaaaaaaaaaaaaaaaaaa"}]},
+  {"title":"Watched Synthetic first video","titleUrl":"https://www.youtube.com/watch?v=aaaaaaaaaaa","time":"2024-03-02T04:30:00Z"},
+  {"title":"Watched Synthetic second video","titleUrl":"https://www.youtube.com/watch?v=bbbbbbbbbbb","time":"2024-04-01T12:00:00Z"},
+  {"title":"Watched a video that has been removed","time":"2024-04-02T12:00:00Z"},
+  {"title":"Watched Unknown local timestamp","titleUrl":"https://www.youtube.com/watch?v=ccccccccccc","time":"2024-04-03 12:00:00"},
+  {"title":"Unrelated activity","titleUrl":"https://example.test/watch?v=ddddddddddd","time":"2024-04-04T12:00:00Z"}
+]

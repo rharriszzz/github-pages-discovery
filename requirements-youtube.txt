@@ -1,0 +1,4 @@
+# Optional; offline research storage, imports, reports and tests use the standard library.
+google-auth>=2.29,<3
+google-auth-oauthlib>=1.2,<2
+requests>=2.31,<3

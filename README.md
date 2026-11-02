@@ -81,6 +81,43 @@ See `RESEARCH_PLAN.md` for survey methodology and `CODEX_PROMPT.md` for the next
 
 This repository now has a **combined research plan** for (a) learning interests from public repositories and authorized YouTube data, (b) rediscovering older videos missing from available watch history, and (c) finding new relevant GitHub Pages sites and other research. Read [`MERGED_PROJECT_PLAN.md`](MERGED_PROJECT_PLAN.md) for the integrated architecture and [`CODEX_PROMPT.md`](CODEX_PROMPT.md) for the staged implementation instructions. The older [`RESEARCH_PLAN.md`](RESEARCH_PLAN.md) remains the detailed baseline for the public GitHub Pages sampling method.
 
-**Current implementation status:** The shipped code still implements only the original **public GitHub Pages pilot** (seven researched seed records). The merged YouTube importer, private history analysis, interest graph and lost-video recommendations are **planned, not yet implemented**. This note documents scope; it does not claim that private playlists are connected or that any Google account has been authorized.
+**Current implementation status:** The original public pilot still has seven researched seed records. The shared private SQLite schema, Desktop read-only OAuth integration, metadata-only playlist inventory/review, Takeout JSON/HTML/CSV foundation, persistent response caches and request budgets are now implemented and tested offline. Google approval and a real playlist inventory have not run. Historical analysis, graph inference and lost-video recommendations remain later gates. See [implementation status](docs/implementation_status.md).
 
 **Data-boundary rule:** All private playlist inventories, Likes, viewing-history exports, user-specific evidence, credentials and OAuth tokens must be stored outside the Git repository. The published `docs/` site contains only reviewed public-safe data. Personal YouTube analysis belongs in a private local application, not on GitHub Pages. 
+
+## Private local research
+
+```bash
+python3 -m pagefinder.local --help
+python3 -m pagefinder.local init
+# After Desktop client setup and optional dependency installation:
+python3 -m pagefinder.local auth
+python3 -m pagefinder.local inventory
+python3 -m pagefinder.local inventory --offline
+```
+
+Follow [YouTube setup and playlist review](docs/youtube_setup.md). Default personal
+storage is `~/.local/share/github-pages-discovery/`, with credentials under
+`~/.config/github-pages-discovery/youtube/`. `--data-dir` and `--config-dir` must
+point outside Git working trees. The first inventory downloads names, descriptions,
+privacy and counts only. Open its local HTML report, annotate purposes/relevance,
+download the annotations outside Git, and apply them with the `annotate` command.
+Playlist content imports require that review. No massive content import runs automatically.
+
+API responses and Takeout source snapshots are cached; offline reruns do not need
+credentials. Incomplete inventory runs checkpoint/resume; `--refresh` explicitly
+starts a new snapshot and preserves old results and annotations. Persistent rate
+budgets are shared by processes using the same ledger, include failed attempts,
+honor server cooldowns and stop at batch/daily ceilings. The public GitHub/site
+clients use the same admission/cache infrastructure with separate public storage.
+Details and limitations are in [architecture](docs/architecture.md).
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m pagefinder report
+python3 -m pagefinder.publication
+```
+
+Both CI and the Pages deployment enforce the public-artifact guard. Only reviewed
+public inputs feed the catalog. Private metrics report watch minutes and viewing
+completion as `not_measurable` when the selected sources lack playback data.
