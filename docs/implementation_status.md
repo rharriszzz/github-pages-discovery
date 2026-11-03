@@ -42,7 +42,8 @@ This records execution, not completion of the entire merged research plan.
 
 The original infrastructure checkpoint passed 43 standard-library tests on
 Python 3.14.4, including the original six. The bookmark extension below raises
-the current total to 52 passing tests.
+that checkpoint's total to 52 passing tests. The bookshelf extension below raises
+the current total to 63 passing tests.
 The CI workflow uses Python 3.11; that interpreter was unavailable locally.
 OAuth SDK invocation is tested with a synthetic mock against its documented
 signature; optional OAuth libraries were not installed in the base interpreter.
@@ -85,8 +86,9 @@ bulk imports. A small real Takeout source is optional and needs explicit selecti
 - Gate 3: actual channel histories, publication-to-first-observation lag, upload
   catalogs for 3–5 selected channels, gap/drift/series analysis, private timeline
   charts and ten human-reviewed suggestions. Chronology-gap tests belong here.
-- Gate 4: actual graph extraction/inference, bounded concept expansion, calibrated
-  ranking facets and keyword-comparator evaluation. Tables alone are not inference.
+- Gate 4: automated extraction/inference, calibrated ranking facets and
+  keyword-comparator evaluation. The curated bookshelf map below is a bounded
+  initial graph, not a completed multi-source preference model or evaluation.
 - Gates 5–6: new 20/100-site pilots, wider crawling and justified scaling.
 - Watch minutes, fractional completion, 50%/95% progress: `not_measurable`.
 - API history/Watch Later unsupported. Likes API (deferred) capped at latest 1,000.
@@ -114,3 +116,36 @@ unchanged source/public files, repeat imports, and durable manual feedback.
 Total: **52 passing tests**. The synthetic Chrome fixture has eight bookmark
 entries, four unique valid items, five saved memberships and two excluded entries.
 No linked-page requests or new public discovery batches are part of this extension.
+
+## Additional source: user-published bookshelf evidence
+
+Safely fetched and fast-forwarded the clean working tree from `64a97d4` to the
+user's `8f73624` bookshelf commit. Existing work was preserved. The Markdown
+transcription is retained unchanged, with 13 identified volumes and its original
+bibliographic uncertainty. A separate public-safe seed map describes 24 subject,
+method and intellectual-history concepts and six cross-disciplinary hypotheses.
+No personalized reading/priority feedback is committed with that map.
+
+The private import uses the requested physical-visibility provenance and reuses
+schema v1. Known source reports, inferred topic mappings and hypothetical research
+connections have different relationship types/statuses. Books do not create
+viewing/reading events or preference weights. Repeated introductory coverage is
+one evidence family, not independent votes. Primary references were checked for
+the proposed directions; only scoped citation metadata and summaries are cached.
+The importer itself makes no requests and does not ingest book full texts/media.
+
+The local viewer exposes books, themes, hypotheses, optional entry points, source
+limitations and durable feedback. Aggregate reading annotations are private and
+do not assign individual completion or proficiency. The independent public
+keyword baseline and seven-site catalog remain unchanged. No larger discovery
+pilot or historical-video analysis was run as part of this integration.
+
+Eleven additional tests bring the total to **63 passing tests**, covering exact
+provenance, typed links, unspecified priorities/progress, bounded hypotheses,
+source validation, cache/idempotency, private aggregate feedback, skip overrides,
+preserved manual reviews/engagement, public-data isolation and offline CLI use.
+Explicit application-scope corrections support both required contexts and soft
+preferences with exploratory additions. Private scoring separates primary and
+exploratory contributions; context keywords still require semantic review, and
+recommendation batch quotas/calibration remain unimplemented. Personal corrections
+are stored outside Git and never rewrite the public keyword comparator.

@@ -3,7 +3,9 @@
 Implemented 2026-11-02. Scope: local evidence/storage, playlist metadata inventory,
 annotations, Takeout foundation, caching and request admission. Historical ranking
 and interest inference remain later gates in `MERGED_PROJECT_PLAN.md`.
-Selected local Chrome bookmark folders are supported as an additional private input.
+Selected local Chrome bookmark folders and a user-published bookshelf transcription
+are supported as additional inputs. The bookshelf has curated concept links;
+automated extraction, calibrated preference inference and ranking remain future work.
 
 ## Two data boundaries
 
@@ -53,8 +55,10 @@ Completeness states are `unknown`, `partial`, `complete_for_request`,
 `bounded_export` and `unsupported`. A complete owned-playlist metadata request
 is not a complete account history. All data derived from an authorized account,
 including publicly visible playlists in its inventory, remains private locally.
-Concepts/candidates currently have schema support only; no interest strength or
-recommendation score is inferred in this milestone.
+Concepts/relationships now contain a bounded curated bookshelf map. Candidate
+ranking still has schema support only; no calibrated interest strength or
+recommendation score is inferred. Bookshelf mappings do not automatically change
+public keyword scores.
 
 ## Cache and request admission
 
@@ -154,6 +158,52 @@ work. These additions reuse schema v1 without a migration.
 
 Format/date references: Chromium's [bookmark codec](https://github.com/chromium/chromium/blob/main/components/bookmarks/browser/bookmark_codec.cc)
 and [time definitions](https://github.com/chromium/chromium/blob/main/base/time/time.h).
+
+### Bookshelf evidence and bounded hypotheses
+
+`import-bookshelf` reads the user-published Markdown transcription and a versioned
+title-level mapping in `data/bookshelf_seeds.json`. It validates all identified
+volumes before writing; changed identifications require an explicit map correction.
+Exact textual inputs and the existing keyword baseline are cached privately.
+The original photograph and book full texts are not inputs to this importer.
+
+The exact provenance is `source=bookshelf_photo_2026_11_02` and
+`evidence_type=physical_book_visible`. A `known` relationship means a book was
+reported visible in that source, not that its contents were read. Book-to-subject,
+method and intellectual-history links are `inferred` title-level interpretations.
+Six adjacent research questions use `hypothesis` links, scoped primary references,
+entry-point proposals and falsification/correction conditions. Keyword-baseline
+links are explicitly distinguished from documented active-project evidence.
+The curated expansion is one step deep and capped at ten questions. The importer
+performs no network calls; checked reference metadata/summaries are cached, not
+the linked articles' full text.
+
+Book counts and repeated foundational subjects create no preference weights.
+All per-book reading states and discovery priorities start unspecified. Optional
+user-reported aggregate reading feedback is stored separately as private manual
+evidence, never assigned to individual books or interpreted as proficiency.
+Suggested small examples and prerequisites coexist with advanced material.
+
+The graph uses schema v1 concepts/relationships and ordinary durable manual reviews.
+Concepts are also represented as entities so feedback can target books or questions.
+Evidence-specific relationships retain source distinctions; unchanged inputs reuse
+their model snapshot without duplicating graph evidence. Reviews remain separate
+from recomputation. Explicitly skipped questions are ineligible for exploration;
+if all supporting books are skipped, that question is ineligible too. This supports
+human review, not automatic broad recursive retrieval or calibrated scoring.
+Private `interest_graph.json` and `interest_graph.html` expose provenance, source
+limitations, proposed connections and feedback. Public exports never read them.
+
+Explicit `set-interest-scope` corrections are separate private manual evidence.
+`require` mode suppresses a topic contribution without its application context;
+`prefer` mode keeps general matches eligible as exploratory additions. Both
+override inferred breadth, survive imports and retain user-reported project status
+without treating project activity as a fixed preference. The effective private
+profile is written to `interest_profile.json`; the public baseline stays intact.
+Private scoring exposes primary/exploratory point contributions separately and
+flags keyword context as triage requiring semantic review. A small exploratory
+allowance is selection guidance; actual batch quotas and calibrated rankings are
+still future work. Explicit skips continue to override exploratory eligibility.
 
 ## Migration and rollback
 

@@ -81,7 +81,7 @@ See `RESEARCH_PLAN.md` for survey methodology and `CODEX_PROMPT.md` for the next
 
 This repository now has a **combined research plan** for (a) learning interests from public repositories and authorized YouTube data, (b) rediscovering older videos missing from available watch history, and (c) finding new relevant GitHub Pages sites and other research. Read [`MERGED_PROJECT_PLAN.md`](MERGED_PROJECT_PLAN.md) for the integrated architecture and [`CODEX_PROMPT.md`](CODEX_PROMPT.md) for the staged implementation instructions. The older [`RESEARCH_PLAN.md`](RESEARCH_PLAN.md) remains the detailed baseline for the public GitHub Pages sampling method.
 
-**Current implementation status:** The original public pilot still has seven researched seed records. The shared private SQLite schema, Desktop read-only OAuth integration, metadata-only playlist inventory/review, Takeout JSON/HTML/CSV foundation, selected Chrome bookmark imports, persistent response caches and request budgets are implemented and tested offline. Account authorization, inventories and personal reports are handled locally; this repository publishes no account-specific results. Historical analysis, graph inference and lost-video recommendations remain later gates. See [implementation status](docs/implementation_status.md).
+**Current implementation status:** The original public pilot still has seven researched seed records. The shared private SQLite schema, Desktop read-only OAuth integration, metadata-only playlist inventory/review, Takeout JSON/HTML/CSV foundation, selected Chrome bookmark imports, curated bookshelf concept mapping, persistent response caches and request budgets are implemented and tested offline. Account authorization, inventories, interest graphs and personal reports are handled locally; this repository publishes no private account records. Historical analysis, automated graph inference, calibrated ranking and lost-video recommendations remain later gates. See [implementation status](docs/implementation_status.md).
 
 **Data-boundary rule:** All private playlist inventories, Likes, viewing-history exports, user-specific evidence, credentials and OAuth tokens must be stored outside the Git repository. The published `docs/` site contains only reviewed public-safe data. Personal YouTube analysis belongs in a private local application, not on GitHub Pages. 
 
@@ -128,6 +128,32 @@ records saved interest without inferring visits, enrollment or completion.
 It makes no network requests and does not copy unrelated bookmarks, sync metadata
 or last-used data. Reruns preserve prior evidence and manual reviews. Personal
 folder names, URLs, counts and reports belong outside public Git data.
+
+The user-published [bookshelf transcription](BOOKSHELF_INTEREST_EVIDENCE.md) also
+supplies a reviewed-source starting point for subjects, methods and mathematical
+connections. Its public title-level mapping is in `data/bookshelf_seeds.json`;
+personal feedback and the instantiated interest graph remain outside Git:
+
+```bash
+python3 -m pagefinder.local import-bookshelf
+python3 -m pagefinder.local interest-graph
+```
+
+The importer records physical visibility separately from inferred topic mappings
+and adjacent research hypotheses. It neither creates reading events nor assigns
+preference weights from book counts. It preserves bibliographic uncertainty,
+provides primary-reference links and optional entry points, and keeps the existing
+keyword profile/catalog unchanged as a comparator. An optional aggregate reading
+annotation never assigns per-book progress. Use the existing private `review`
+command on book/question IDs in `interest_graph.json`; corrections survive imports
+and explicit question skips disable exploration eligibility. Source snapshots,
+graph JSON and the searchable `interest_graph.html` viewer remain private.
+Explicit application preferences can be saved with `set-interest-scope`: require
+a context, or prefer it while retaining a small exploratory supplement. These
+private corrections override weak source-derived assumptions without editing the
+public comparator. `interest_profile.json` exposes the effective private profile;
+private keyword scoring separates primary and exploratory contributions. It is
+still an uncalibrated triage aid, not a completed recommendation queue.
 
 ```bash
 python3 -m unittest discover -s tests -v

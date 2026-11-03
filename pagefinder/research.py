@@ -148,9 +148,31 @@ class Store:
                             'updated_at=excluded.updated_at,evidence_id=excluded.evidence_id',
                             (entity_id, decision, reason, now(), eid))
 
+    def concept(self, concept_id, label, kind, evidence_id):
+        if kind not in ('subject', 'method', 'question', 'history', 'baseline'):
+            raise ValueError('Unsupported concept type')
+        # Mirror as an entity so ordinary durable reviews can target concepts too.
+        self.entity(concept_id, 'interest_concept', concept_id, label, evidence_id)
+        self.db.execute('INSERT INTO concepts VALUES (?,?,?,?) ON CONFLICT(id) DO UPDATE SET '
+                        'label=excluded.label,kind=excluded.kind,evidence_id=excluded.evidence_id',
+                        (concept_id, label, kind, evidence_id))
+
+    def relationship(self, subject, predicate, object_id, status, evidence_id, *,
+                     confidence, falsification):
+        if status not in ('known', 'inferred', 'hypothesis') or not predicate or not falsification:
+            raise ValueError('Graph links require status, predicate and a correction/falsification condition')
+        for endpoint in (subject, object_id):
+            if not self.db.execute('SELECT 1 FROM entities WHERE id=?', (endpoint,)).fetchone():
+                raise ValueError('Graph relationship endpoint does not exist')
+        rid = stable_id(subject, predicate, object_id, evidence_id)
+        self.db.execute('INSERT INTO relationships VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(id) '
+                        'DO UPDATE SET confidence=excluded.confidence,falsification=excluded.falsification',
+                        (rid, subject, predicate, object_id, status, confidence, evidence_id, falsification))
+        return rid
+
     def coverage(self):
         counts = {name: self.db.execute('SELECT count(*) FROM ' + name).fetchone()[0]
-                  for name in ('entities', 'observations', 'evidence', 'reviews')}
+                  for name in ('entities', 'observations', 'evidence', 'reviews', 'concepts', 'relationships')}
         sources = [dict(row) for row in self.db.execute(
             'SELECT source_type,completeness,count(*) AS snapshots FROM evidence '
             'GROUP BY source_type,completeness')]

@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "source": "bookshelf_photo_2026_11_02",
+  "evidence_type": "physical_book_visible",
+  "source_url": "https://github.com/rharriszzz/github-pages-discovery/blob/main/BOOKSHELF_INTEREST_EVIDENCE.md",
+  "concepts": [
+    {"id":"control","label":"Robust control","kind":"subject"},
+    {"id":"feedback","label":"Feedback and stabilization","kind":"method"},
+    {"id":"uncertainty","label":"Uncertainty and sensitivity","kind":"subject"},
+    {"id":"relativity","label":"General relativity","kind":"subject"},
+    {"id":"geometry","label":"Manifolds and differential geometry","kind":"subject"},
+    {"id":"tensors","label":"Tensor calculus and differential forms","kind":"method"},
+    {"id":"mechanics","label":"Classical mechanics","kind":"subject"},
+    {"id":"variational","label":"Variational principles","kind":"method"},
+    {"id":"hamiltonian","label":"Hamiltonian formulation","kind":"method"},
+    {"id":"dynamics","label":"Dynamical systems","kind":"subject"},
+    {"id":"symplectic","label":"Symplectic geometry","kind":"subject"},
+    {"id":"electronics","label":"Analog and digital electronics","kind":"subject"},
+    {"id":"measurement","label":"Measurement and instrumentation","kind":"method"},
+    {"id":"composites","label":"Composite materials","kind":"subject"},
+    {"id":"calculus","label":"Calculus and quantitative modeling","kind":"method"},
+    {"id":"asymptotics","label":"Asymptotic approximation","kind":"method"},
+    {"id":"perturbation","label":"Perturbation theory","kind":"method"},
+    {"id":"fourier","label":"Fourier analysis","kind":"method"},
+    {"id":"differential_equations","label":"Differential equations","kind":"method"},
+    {"id":"linear_algebra","label":"Linear algebra","kind":"method"},
+    {"id":"information","label":"Information theory","kind":"subject"},
+    {"id":"invention_history","label":"Mathematical invention and intellectual history","kind":"history"},
+    {"id":"voa","label":"Vertex operator algebras and monstrous moonshine","kind":"subject"},
+    {"id":"representations","label":"Representation theory","kind":"subject"}
+  ],
+  "books": [
+    {"number":1,"title":"Essentials of Robust Control","concepts":["control","feedback","uncertainty"]},
+    {"number":2,"title":"Spacetime and Geometry","concepts":["relativity","geometry","tensors"]},
+    {"number":3,"title":"Mechanics","concepts":["mechanics","variational","hamiltonian"]},
+    {"number":4,"title":"The Art of Electronics","concepts":["electronics","measurement"]},
+    {"number":5,"title":"Tensor Analysis on Manifolds","concepts":["geometry","tensors"]},
+    {"number":6,"title":"General Relativity","concepts":["relativity","geometry"]},
+    {"number":7,"title":"Composite Basics – 5","concepts":["composites"]},
+    {"number":8,"title":"Calculus","concepts":["calculus","differential_equations"]},
+    {"number":9,"title":"Advanced Mathematical Methods for Scientists and Engineers: Asymptotic Methods and Perturbation Theory","concepts":["asymptotics","perturbation"]},
+    {"number":10,"title":"A Mind at Play","concepts":["information","invention_history"]},
+    {"number":11,"title":"Mathematical Methods of Classical Mechanics","concepts":["mechanics","dynamics","hamiltonian","symplectic"]},
+    {"number":12,"title":"Vertex Operator Algebras and the Monster","concepts":["voa","representations"]},
+    {"number":13,"title":"Mathematical Methods for Physics and Engineering","concepts":["differential_equations","linear_algebra","fourier"]}
+  ],
+  "clusters": [
+    {"label":"Geometry and mathematical physics","books":[2,3,5,6,11],"interpretation":"Geometry provides a common language for spacetime, mechanical evolution and physical invariants."},
+    {"label":"Approximation and mathematical methods","books":[8,9,13],"interpretation":"Calculus, differential equations, Fourier methods and perturbations connect exact formulations to computable approximations."},
+    {"label":"Physical engineering","books":[1,4,7],"interpretation":"Feedback, measurement and materials connect mathematical models to hardware; the materials connection remains tentative."},
+    {"label":"Algebraic structure","books":[12],"interpretation":"A specialized algebraic direction should remain visible even though it has only one volume."},
+    {"label":"Information and invention","books":[10],"interpretation":"A biographical source suggests curiosity about Shannon and invention; it is not evidence of studying a technical information-theory textbook."}
+  ],
+  "hypotheses": [
+    {
+      "id":"geometric_fluids",
+      "question":"Which physical invariants should a fluid discretization preserve, and what changes when it does?",
+      "books":[3,5,11,13],"concepts":["variational","hamiltonian","geometry","differential_equations"],
+      "baseline_topics":["Fluid dynamics and Navier–Stokes","Interactive scientific explanation"],
+      "connection":"Geometric mechanics offers a route from symmetry and variational principles to fluid algorithms that preserve selected discrete structure.",
+      "entry_point":"Compare circulation and energy behavior on a small inviscid-flow example; distinguish exact invariants from good long-term energy behavior.",
+      "falsification":"Deprioritize if conservation diagnostics and geometric methods are not useful to the user's actual fluid questions; this is not automatically a viscous Navier–Stokes solver.",
+      "reference":{"title":"Structure-Preserving Discretization of Incompressible Fluids","url":"https://arxiv.org/abs/0912.3989","checked":"2026-11-02","scope":"Author abstract: variational discretization of Euler fluids and a discrete circulation theorem; not a claim about every invariant or viscous flow."}
+    },
+    {
+      "id":"transient_growth",
+      "question":"Can a linearly stable model still strongly amplify disturbances before they decay?",
+      "books":[1,9,13],"concepts":["control","uncertainty","perturbation","linear_algebra"],
+      "baseline_topics":["Fluid dynamics and Navier–Stokes","Systems programming and performance"],
+      "connection":"Robust-control sensitivity and non-normal linear dynamics meet in transient growth, resolvent analysis and pseudospectra.",
+      "entry_point":"Start with a two-by-two non-normal matrix; compare eigenvalues with finite-time disturbance amplification before examining a fluid operator.",
+      "falsification":"Deprioritize if the relevant operators are effectively normal or finite-time disturbance growth is not an active concern; linear amplification alone does not prove nonlinear transition.",
+      "reference":{"title":"Hydrodynamic Stability Without Eigenvalues","url":"https://people.maths.ox.ac.uk/trefethen/publication/PDF/1993_57.pdf","checked":"2026-11-02","scope":"Author-hosted paper: nonmodal amplification in shear flows can matter even with decaying eigenmodes."}
+    },
+    {
+      "id":"noisy_inverse_problems",
+      "question":"Which assumptions let a noisy measurement support a reliable reconstruction?",
+      "books":[4,10,13],"concepts":["electronics","measurement","information","fourier","linear_algebra"],
+      "baseline_topics":["Computational imaging and geometry","Music transcription and notation"],
+      "connection":"Instrumentation, information and Fourier methods suggest inverse problems and sparse recovery as bridges to imaging and audio.",
+      "entry_point":"Reconstruct a small synthetic signal from noisy or incomplete measurements, then test sensitivity to sparsity and measurement assumptions.",
+      "falsification":"Deprioritize sparse recovery where the signal/model is not sufficiently sparse or the sensing assumptions fail; the book biography does not establish this technical preference.",
+      "reference":{"title":"Stable Signal Recovery from Incomplete and Inaccurate Measurements","url":"https://arxiv.org/abs/math/0503066","checked":"2026-11-02","scope":"Author abstract: recovery guarantees under specified sparsity and measurement conditions; application to a particular image or musical signal remains a hypothesis."}
+    },
+    {
+      "id":"computational_geometry_gr",
+      "question":"Can computational geodesics and tensor calculations make geometric physics easier to explore and verify?",
+      "books":[2,5,6,11],"concepts":["relativity","geometry","tensors","hamiltonian"],
+      "baseline_topics":["Mathematics and mathematical physics","Interactive scientific explanation"],
+      "connection":"Relativity and manifold methods can be explored through symbolic curvature calculations and numerical trajectories, with coordinate and conservation checks.",
+      "entry_point":"Use a familiar metric for a small geodesic visualization and verify a known limit before moving toward Kerr geometry.",
+      "falsification":"Deprioritize if the interest is primarily axiomatic/analytic rather than computational; a convincing picture is not a correctness proof.",
+      "reference":{"title":"EinsteinPy project","url":"https://einsteinpy.org/","checked":"2026-11-02","scope":"Official project page describes geodesic trajectories, symbolic tensor calculations and visualization; suitability and numerical validation remain to be assessed."}
+    },
+    {
+      "id":"coupled_engineering",
+      "question":"How should structures, uncertainty and control be designed together rather than optimized separately?",
+      "books":[1,4,7],"concepts":["composites","control","measurement","uncertainty"],
+      "baseline_topics":["Space systems and orbital computing"],
+      "connection":"Materials, sensing and feedback suggest coupled structural/control and thermal design studies, potentially including aerospace applications.",
+      "entry_point":"Begin with a small mass/stiffness/control tradeoff; establish whether the composite-materials book is relevant before making aerospace-specific assumptions.",
+      "falsification":"Treat as tentative until the materials title/purpose and an actual coupled-design question are confirmed; do not infer a current aerospace priority from the shelf.",
+      "reference":{"title":"OpenMDAO project","url":"https://openmdao.org/","checked":"2026-11-02","scope":"Official project page gives multidisciplinary optimization, aerostructural and cubesat examples; no claim that it validates a specific composite design."}
+    },
+    {
+      "id":"formal_algebra",
+      "question":"Which small algebraic foundations could be formalized before attempting machinery from vertex operator algebras?",
+      "books":[12],"concepts":["voa","representations"],
+      "baseline_topics":["AI for mathematics and science","Mathematics and mathematical physics"],
+      "connection":"Representation theory and graded algebra offer possible stepping stones toward computer-checked mathematical structure.",
+      "entry_point":"Survey graded-algebra and representation primitives, then choose one small identity or construction to formalize with explicit definitions.",
+      "falsification":"Deprioritize if formalization is not useful to the user's algebra questions; existing graded-algebra infrastructure is not evidence that vertex operator algebra or the Monster construction is already formalized.",
+      "reference":{"title":"Mathlib graded-algebra documentation","url":"https://leanprover-community.github.io/mathlib4_docs/Mathlib/RingTheory/GradedAlgebra/Basic.html","checked":"2026-11-02","scope":"Official library documentation defines internally graded algebra structures; the bridge to VOA formalization is an exploratory proposal."}
+    }
+  ]
+}

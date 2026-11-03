@@ -8,6 +8,7 @@ import sys
 
 from .net import BudgetExceeded, ResponseError
 from .bookmarks import import_bookmarks
+from .interests import import_bookshelf, set_interest_scope, write_interest_graph, DEFAULT_SOURCE
 from .privacy import config_dir, data_dir, private_json
 from .research import Store
 from .takeout import import_takeout
@@ -39,6 +40,19 @@ def main(argv=None):
     bookmarks.add_argument('source', help='Chrome profile Bookmarks JSON file outside Git')
     bookmarks.add_argument('--folder', action='append', required=True,
                            help='Repeat for each folder; use root/folder path when names are ambiguous')
+    shelf = sub.add_parser('import-bookshelf', help='Import title-level bookshelf evidence and curated concept hypotheses')
+    shelf.add_argument('source', nargs='?', default=str(DEFAULT_SOURCE))
+    shelf.add_argument('--overall-reading-completion', choices=('unknown', 'low', 'partial', 'high'),
+                       help='Optional private user-reported aggregate; never assigns per-book completion')
+    sub.add_parser('interest-graph', help='Regenerate the private bookshelf graph with durable manual feedback')
+    scope = sub.add_parser('set-interest-scope', help='Persist an explicit private application constraint on a baseline topic')
+    scope.add_argument('topic')
+    scope.add_argument('--label', required=True)
+    scope.add_argument('--context', action='append', required=True, help='Repeat for each required-context keyword alternative')
+    scope.add_argument('--project-status', choices=('unspecified', 'active', 'stopped'), default='unspecified')
+    scope.add_argument('--mode', choices=('require', 'prefer'), default='require',
+                       help='Require context, or prefer it while allowing a small exploratory supplement')
+    scope.add_argument('--note', default='')
     rev = sub.add_parser('review', help='Persist explicit manual feedback independently of recomputation')
     rev.add_argument('entity_id')
     rev.add_argument('decision', choices=('keep', 'skip', 'later', 'already_watched', 'unknown'))
@@ -79,8 +93,22 @@ def main(argv=None):
                   report['new_saved_memberships'], 'new saved memberships;', report['excluded'], 'excluded')
             print('Private local viewer:', folder / 'bookmark_inventory.html')
             print('External requests: 0. Bookmarks indicate saving; visits and completion remain unknown.')
+        elif args.command == 'import-bookshelf':
+            report = import_bookshelf(store, args.source, overall_reading_completion=args.overall_reading_completion)
+            print('Bookshelf:', len(report['books']), 'volumes;', len(report['hypotheses']), 'exploratory questions')
+            print('Private graph report:', folder / 'interest_graph.html')
+            print('No reading events or preference weights assigned; public keyword baseline unchanged.')
+        elif args.command == 'interest-graph':
+            write_interest_graph(store)
+            print('Private graph regenerated:', folder / 'interest_graph.html')
+        elif args.command == 'set-interest-scope':
+            set_interest_scope(store, args.topic, args.label, args.context,
+                               project_status=args.project_status, note=args.note, mode=args.mode)
+            print('Explicit scope correction saved privately; inferred topic breadth is overridden.')
         elif args.command == 'review':
             store.review(args.entity_id, args.decision, args.reason)
+            if store.get_checkpoint('active_bookshelf_model'):
+                write_interest_graph(store)
             print('Manual feedback saved locally.')
         else:
             private_json(folder / 'evidence_coverage.json', store.coverage())
