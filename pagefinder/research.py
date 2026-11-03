@@ -172,7 +172,7 @@ class Store:
 
     def coverage(self):
         counts = {name: self.db.execute('SELECT count(*) FROM ' + name).fetchone()[0]
-                  for name in ('entities', 'observations', 'evidence', 'reviews', 'concepts', 'relationships')}
+                  for name in ('entities', 'observations', 'evidence', 'reviews', 'concepts', 'relationships', 'candidates')}
         sources = [dict(row) for row in self.db.execute(
             'SELECT source_type,completeness,count(*) AS snapshots FROM evidence '
             'GROUP BY source_type,completeness')]

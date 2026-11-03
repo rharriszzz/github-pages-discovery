@@ -56,9 +56,8 @@ Completeness states are `unknown`, `partial`, `complete_for_request`,
 is not a complete account history. All data derived from an authorized account,
 including publicly visible playlists in its inventory, remains private locally.
 Concepts/relationships now contain a bounded curated bookshelf map. Candidate
-ranking still has schema support only; no calibrated interest strength or
-recommendation score is inferred. Bookshelf mappings do not automatically change
-public keyword scores.
+records support a manually assessed private review queue; ranking remains
+uncalibrated. Bookshelf mappings do not automatically change public keyword scores.
 
 ## Cache and request admission
 
@@ -204,6 +203,33 @@ Private scoring exposes primary/exploratory point contributions separately and
 flags keyword context as triage requiring semantic review. A small exploratory
 allowance is selection guidance; actual batch quotas and calibrated rankings are
 still future work. Explicit skips continue to override exploratory eligibility.
+
+### Explicit statements and a first review queue
+
+`import-interest-notes SOURCE` accepts a bounded private JSON document with
+background, interests, appreciated resources and hypothetical connections. All
+records have cached source evidence. Self-reported statements have known links;
+proposals have hypothesis links. Appreciation does not add a photographed book,
+ownership claim or completion event. Explicit statements take precedence over
+weak source inference. Search terms are curated vocabulary rather than additional
+claims about preferred subfields; private scoring exposes their matches separately
+without assigning numerical priority. Background is not used to infer expertise
+in every subfield, and low book completion is not treated as low proficiency.
+
+`import-candidate-batch SOURCE` imports at most 20 manually assessed public
+repositories from cached connector results and site checks. It requires public
+repository metadata and a successful README excerpt, records owner account type,
+native IDs, archive/activity metadata, README blob IDs, exclusions and request
+accounting, and reuses schema v1 candidates. Fit, method, novelty, quality, activity
+and evidence facets remain separate. Novelty and usefulness are unknown until
+human review. Cached sources include unsuccessful attempts; no remote code runs.
+
+The private queue compares the independent keyword baseline with private explicit
+interest/context matches. This is explanatory triage, not a calibrated improvement
+claim. `review-queue` regenerates local HTML/JSON with durable decisions; normal
+`review` commands refresh the graph and queue. Exact raw connector/site responses
+and personalized assessment reasons remain outside Git. The public catalog does
+not read these sources and is unchanged by the private probe.
 
 ## Migration and rollback
 

@@ -13,7 +13,7 @@ import re
 from urllib.parse import urlsplit
 
 from .core import ROOT, score as keyword_score
-from .privacy import private_json, private_write
+from .privacy import outside_repo, private_json, private_write
 from .research import stable_id
 
 DEFAULT_SOURCE = ROOT / 'BOOKSHELF_INTEREST_EVIDENCE.md'
@@ -257,12 +257,86 @@ def score_private(row, profile):
             allowed.append(topic)
     result = keyword_score(row, allowed)
     exploratory_matches = [f for f in result['evidence'] if f['topic'] in exploratory]
+    declared_matches = []
+    for declaration in profile.get('declared_interests', []):
+        terms = [t for t in declaration.get('terms', []) if re.search(
+            r'(?<!\w)' + re.escape(t) + r'(?!\w)', text, re.I)]
+        if terms:
+            declared_matches.append({'topic': declaration['label'], 'terms': terms,
+                                     'evidence_id': declaration['evidence_id'],
+                                     'basis': 'explicit interest; search vocabulary is a curated interpretation'})
     return {**result, 'visibility': 'private', 'context_suppressed_topics': suppressed,
+            'declared_matches': declared_matches,
             'exploratory_topics': [f['topic'] for f in exploratory_matches],
             'primary_points': sum(f['points'] for f in result['evidence'] if f['topic'] not in exploratory),
             'exploratory_points': sum(f['points'] for f in exploratory_matches),
             'selection_policy': 'Prefer primary matches; allow a small exploratory supplement. Batch quotas are not yet implemented.',
             'limitation': 'Context keywords are triage; semantic application relevance still needs review.'}
+
+
+def import_interest_notes(store, source):
+    """Persist explicit statements separately from inferred source interests."""
+    source = outside_repo(source)
+    payload = json.loads(_read(source))
+    sections = ('background', 'interests', 'resources', 'hypotheses')
+    if not isinstance(payload, dict) or payload.get('version') != 1 or set(payload) - {'version', *sections}:
+        raise ValueError('Expected version 1 private interest notes')
+    for section in sections:
+        records = payload.get(section, [])
+        if not isinstance(records, list) or len(records) > 30:
+            raise ValueError('Interest note sections must be bounded lists')
+        for item in records:
+            if (not isinstance(item, dict) or not isinstance(item.get('label'), str) or
+                    not item['label'].strip() or not isinstance(item.get('note', ''), str)):
+                raise ValueError('Interest note records need a label and optional text note')
+            if section == 'interests' and (item.get('kind', 'subject') not in ('subject', 'method') or
+                    not isinstance(item.get('terms', []), list) or
+                    any(not isinstance(t, str) or not t.strip() for t in item.get('terms', []))):
+                raise ValueError('Declared interests need a concept type and text search vocabulary')
+            if section == 'resources':
+                url = urlsplit(item.get('url', ''))
+                if url.scheme != 'https' or not url.hostname or url.username or url.password:
+                    raise ValueError('Appreciated resources need a public HTTPS reference')
+    digest = stable_id(payload)
+    snapshot = store.folder / 'sources' / ('interest-notes-' + digest + '.json')
+    private_json(snapshot, {'visibility': 'private', **payload})
+    imported = store.get_checkpoint('interest_notes_import:' + digest)
+    context = store.get_checkpoint('explicit_interest_notes', {s: {} for s in sections})
+    if imported is None:
+        with store.db:
+            ev = store.evidence('manual_interest_notes', str(snapshot), notes={
+                'scope': 'User-reported background, explicit interests and appreciation; hypotheses remain proposals.',
+                'education_policy': 'Self-reported background, not independent credential verification or graduate-level proficiency.',
+                'reading_policy': 'Appreciation does not establish ownership or completed reading.',
+                'terms_policy': 'Search vocabulary does not establish interest in every named subfield.'})
+            root = 'profile:explicit_statements'
+            store.entity(root, 'profile_context', root, 'Explicit user statements', ev)
+            imported = {s: {} for s in sections}
+            for section in sections:
+                for item in payload.get(section, []):
+                    nid = 'declared:' + section + ':' + stable_id(item['label'].strip().casefold())
+                    if section in ('interests', 'hypotheses'):
+                        store.concept(nid, item['label'], 'question' if section == 'hypotheses' else item.get('kind', 'subject'), ev)
+                    else:
+                        store.entity(nid, 'reported_background' if section == 'background' else 'appreciated_resource',
+                                     nid, item['label'], ev, url=item.get('url', ''))
+                    predicate = {'background': 'reports_background', 'interests': 'declares_interest',
+                                 'resources': 'appreciates_resource', 'hypotheses': 'proposes_connection'}[section]
+                    rid = store.relationship(root, predicate, nid, 'hypothesis' if section == 'hypotheses' else 'known', ev,
+                                             confidence=.7 if section == 'hypotheses' else 1.0,
+                                             falsification='Revise from explicit user corrections; proposals require independent usefulness review.')
+                    imported[section][nid] = {**item, 'entity_id': nid, 'evidence_id': ev,
+                                              'root_id': root, 'edge_id': rid,
+                                              'status': 'hypothesis' if section == 'hypotheses' else 'user_reported'}
+            store.checkpoint('interest_notes_import:' + digest, imported)
+    with store.db:
+        for section in sections:
+            context[section].update(imported[section])
+        store.checkpoint('explicit_interest_notes', context)
+    private_json(store.folder / 'explicit_interest_notes.json', {'visibility': 'private', **context})
+    if store.get_checkpoint('active_bookshelf_model'):
+        write_interest_graph(store)
+    return context
 
 
 def write_interest_graph(store):
@@ -290,6 +364,16 @@ def write_interest_graph(store):
                 nodes.append({**dict(row), 'review': review(nid)})
                 seen_nodes.add(nid)
         report['relationships'].append(dict(store.db.execute('SELECT * FROM relationships WHERE id=?', (scope['edge_id'],)).fetchone()))
+    notes = store.get_checkpoint('explicit_interest_notes', {})
+    report['explicit_statements'] = {section: list(records.values()) for section, records in notes.items()}
+    for records in notes.values():
+        for item in records.values():
+            for nid in (item['root_id'], item['entity_id']):
+                if nid not in seen_nodes:
+                    row = store.db.execute('SELECT id,kind,title,canonical_url,evidence_id FROM entities WHERE id=?', (nid,)).fetchone()
+                    nodes.append({**dict(row), 'review': review(nid)})
+                    seen_nodes.add(nid)
+            report['relationships'].append(dict(store.db.execute('SELECT * FROM relationships WHERE id=?', (item['edge_id'],)).fetchone()))
     report['nodes'] = nodes
     snapshot = json.loads(Path(report['source_snapshot']).read_text(encoding='utf-8'))
     effective = snapshot['keyword_baseline']
@@ -303,6 +387,9 @@ def write_interest_graph(store):
             topic['context_policy'] = correction.get('mode', 'require')
             topic['scope_evidence_id'] = correction['evidence_id']
     report['effective_keyword_profile'] = {'visibility': 'private', **effective,
+        'declared_interests': report['explicit_statements'].get('interests', []),
+        'background': report['explicit_statements'].get('background', []),
+        'priority_policy': 'Explicit declarations take precedence over weak source inference; numerical priorities remain uncalibrated.',
         'weight_status': 'Existing comparator weights are uncalibrated; explicit context restrictions take precedence.'}
     for book in report['books']:
         book['review'] = review(book['entity_id'])
@@ -321,7 +408,7 @@ def write_interest_graph(store):
             hypothesis['scope_status'] = 'unreviewed_proposal'
     report['reading_completion_feedback'] = store.get_checkpoint('bookshelf_reading_feedback', {
         'overall': 'unspecified', 'scope': 'aggregate_only', 'per_book': 'unspecified'})
-    report['entry_point_policy'] = 'Offer optional prerequisites and small examples alongside deep material; do not infer proficiency or impose a beginner-only ranking.'
+    report['entry_point_policy'] = 'Use self-reported background and method affinities; low book completion does not imply low proficiency. Offer optional entry points alongside deep material.'
     report['source_coverage'] = store.coverage()
     private_json(store.folder / 'interest_graph.json', report)
     private_json(store.folder / 'interest_profile.json', report['effective_keyword_profile'])
@@ -352,6 +439,9 @@ def _write_viewer(path, report):
                      ' · Related projects: ' + h(s['related_project_status']) +
                      ' · Policy: ' + h(s['policy']) + '</li>'
                      for s in report['interest_scope_corrections'])
+    statements = ''.join('<li><strong>' + h(section) + ': ' + h(item['label']) + '</strong> — ' +
+                         h(item.get('note', '')) + ' (' + h(item['status']) + ')</li>'
+                         for section, items in report['explicit_statements'].items() for item in items)
     page = '''<!doctype html><html lang="en"><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Private bookshelf interest graph</title><style>
@@ -363,6 +453,7 @@ Repeated introductory topics do not create preference weights. Baseline links ar
 <p>Overall reading completion (user report): ''' + h(report['reading_completion_feedback']['overall']) + '''.
 Per-book completion remains unspecified. Entry points are optional; deeper material remains eligible.</p>
 <h2>Explicit interest corrections</h2><ul>''' + scopes + '''</ul>
+<h2>User statements and separate proposals</h2><ul>''' + statements + '''</ul>
 <label>Filter books and questions <input id="filter" type="search"></label><h2>Candidate themes</h2><ul>''' + clusters + '''</ul>
 <h2>Books</h2><table><thead><tr><th>#</th><th>Book / reported authors</th><th>Source concept seeds</th><th>Review</th></tr></thead><tbody>''' + books + '''</tbody></table>
 <h2>Exploratory questions</h2>''' + ''.join(cards) + '''

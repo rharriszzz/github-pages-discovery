@@ -8,7 +8,8 @@ import sys
 
 from .net import BudgetExceeded, ResponseError
 from .bookmarks import import_bookmarks
-from .interests import import_bookshelf, set_interest_scope, write_interest_graph, DEFAULT_SOURCE
+from .interests import import_bookshelf, import_interest_notes, set_interest_scope, write_interest_graph, DEFAULT_SOURCE
+from .candidates import import_candidate_batch, write_review_queue
 from .privacy import config_dir, data_dir, private_json
 from .research import Store
 from .takeout import import_takeout
@@ -45,6 +46,11 @@ def main(argv=None):
     shelf.add_argument('--overall-reading-completion', choices=('unknown', 'low', 'partial', 'high'),
                        help='Optional private user-reported aggregate; never assigns per-book completion')
     sub.add_parser('interest-graph', help='Regenerate the private bookshelf graph with durable manual feedback')
+    notes = sub.add_parser('import-interest-notes', help='Import private explicit interests/background, with hypotheses kept separate')
+    notes.add_argument('source')
+    batch = sub.add_parser('import-candidate-batch', help='Create a private review queue from a bounded cached research batch')
+    batch.add_argument('source')
+    sub.add_parser('review-queue', help='Regenerate the private candidate queue with saved feedback')
     scope = sub.add_parser('set-interest-scope', help='Persist an explicit private application constraint on a baseline topic')
     scope.add_argument('topic')
     scope.add_argument('--label', required=True)
@@ -101,6 +107,16 @@ def main(argv=None):
         elif args.command == 'interest-graph':
             write_interest_graph(store)
             print('Private graph regenerated:', folder / 'interest_graph.html')
+        elif args.command == 'import-interest-notes':
+            context = import_interest_notes(store, args.source)
+            print('Private interest notes saved:', sum(len(records) for records in context.values()), 'records')
+        elif args.command == 'import-candidate-batch':
+            report = import_candidate_batch(store, args.source)
+            print('Private candidates ready for review:', len(report['candidates']))
+            print('Local viewer:', folder / 'discovery_queue.html')
+        elif args.command == 'review-queue':
+            write_review_queue(store)
+            print('Private review queue regenerated:', folder / 'discovery_queue.html')
         elif args.command == 'set-interest-scope':
             set_interest_scope(store, args.topic, args.label, args.context,
                                project_status=args.project_status, note=args.note, mode=args.mode)
@@ -109,6 +125,8 @@ def main(argv=None):
             store.review(args.entity_id, args.decision, args.reason)
             if store.get_checkpoint('active_bookshelf_model'):
                 write_interest_graph(store)
+            if store.get_checkpoint('active_candidate_batch'):
+                write_review_queue(store)
             print('Manual feedback saved locally.')
         else:
             private_json(folder / 'evidence_coverage.json', store.coverage())

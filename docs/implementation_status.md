@@ -2,6 +2,64 @@
 
 This records execution, not completion of the entire merged research plan.
 
+## Current checkpoint
+
+The source-ingest foundation now produces a first private, evidence-backed review
+queue. This is a useful discovery checkpoint, not completion of the research plan.
+
+Implemented:
+
+- Private source ingestion for reviewed playlist metadata/annotations, selected
+  Chrome bookmark folders, bookshelf transcription and explicit interest notes.
+- A curated graph with provenance, known/inferred/hypothetical link types, durable
+  feedback, application preferences, and separate user-reported background.
+- A bounded five-public-repository probe with cached metadata and README excerpts.
+  Two selected GitHub Pages sites also passed independent robots-respecting HTML
+  checks. All five repository owners in this targeted probe are Organization
+  accounts; the sample supports no population-wide ownership conclusions.
+- A private review queue with separate fit/method/novelty/quality/activity/evidence
+  facets, source limitations and a fixed-keyword-baseline comparison. Familiarity,
+  novelty and human usefulness are still unmeasured. No remote project code ran.
+- Cache reuse, persistent request budgets/cooldowns, private report isolation and
+  a guarded public export. The original seven-site public sample is preserved.
+
+Validation and request accounting for this checkpoint:
+
+- **69 tests passed** locally. Public export regeneration and publication guard
+  pass; original public HTML/CSV/JSON and public keyword inputs remain unchanged.
+- **13 logical GitHub connector calls**, including one README 404. A directory
+  listing resolved the correct filename. Connector-internal HTTP counts and rate
+  headers are not exposed; each logical call passed local conservative admission.
+- **6 site-request reservations**: two initial sandbox transport failures, then
+  two successful robots fetches and two successful page fetches. Initial failures
+  and successful checks are retained in the cached evidence.
+- No YouTube API batch, bulk playlist import or missed-video evaluation ran in
+  this increment. Public documentation lookups are separate from probe accounting.
+- Detailed personal notes, recommendations, raw probe responses and review state
+  are local/private, not published in these docs.
+
+Next work, in order of practical usefulness:
+
+1. Review the five candidates for keep/later/skip and reasons. This establishes
+   usefulness and false positives; record counts alone do not establish success.
+2. Corroborate the profile with a bounded examination of selected bookmarked
+   public pages and the user's public project READMEs/plans/relevant branches.
+3. Run the planned 20-site pilot with diverse cohorts and independent verification;
+   expand toward 100 only after review. The present five-repository probe is not
+   that 20-site experiment and includes sites outside the github.io-only frame.
+4. For lost-video recovery, import a selected real Takeout history source, choose
+   3–5 creator channels, implement upload chronology/gap/drift analysis and evaluate
+   ten suggestions. Playlist purpose annotation is not selection of every playlist.
+5. Calibrate preference/ranking facets and implement actual exploration quotas and
+   queue selection using feedback. Automatic source-to-concept extraction and
+   broad recursive exploration remain incomplete. The current graph is curated.
+
+Private inputs do not establish viewing duration, course completion, proficiency
+or an unseen video's unwatched status. Playback-completion metrics remain
+`not_measurable`. No uncontrolled crawls, scheduled jobs or paid model calls run.
+
+The sections below preserve earlier implementation checkpoints and denominators.
+
 ## Reconciliation and existing behavior
 
 - Inspected both authoritative plans, the original research plan, all original
@@ -43,7 +101,8 @@ This records execution, not completion of the entire merged research plan.
 The original infrastructure checkpoint passed 43 standard-library tests on
 Python 3.14.4, including the original six. The bookmark extension below raises
 that checkpoint's total to 52 passing tests. The bookshelf extension below raises
-the current total to 63 passing tests.
+that checkpoint's total to 63 passing tests. The current checkpoint above has
+69 passing tests.
 The CI workflow uses Python 3.11; that interpreter was unavailable locally.
 OAuth SDK invocation is tested with a synthetic mock against its documented
 signature; optional OAuth libraries were not installed in the base interpreter.

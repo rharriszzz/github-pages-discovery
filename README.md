@@ -153,7 +153,27 @@ a context, or prefer it while retaining a small exploratory supplement. These
 private corrections override weak source-derived assumptions without editing the
 public comparator. `interest_profile.json` exposes the effective private profile;
 private keyword scoring separates primary and exploratory contributions. It is
-still an uncalibrated triage aid, not a completed recommendation queue.
+still an uncalibrated triage aid, not a calibrated recommendation engine.
+
+Private `import-interest-notes SOURCE` records explicit interests, self-reported
+background and appreciated resources separately from proposed connections. Its
+search vocabulary is a curated interpretation, not a claim that every subfield
+is preferred. Background and reading completion are separate dimensions. These
+notes enrich the private graph/profile without changing the public comparator.
+
+A first bounded public-project probe now has a private review queue. It includes
+cached repository metadata/README excerpts, independent HTML checks for two
+selected Pages sites, separate assessment facets and a keyword-baseline comparison.
+Usefulness and novelty remain unmeasured until human review. No project code was
+installed or executed. The existing public seven-site sample remains unchanged.
+
+```bash
+python3 -m pagefinder.local review-queue
+```
+
+The local `discovery_queue.html` and JSON source details stay outside Git. Saved
+`review` decisions refresh both private viewers. See the current checkpoint and
+remaining work at the top of [implementation status](docs/implementation_status.md).
 
 ```bash
 python3 -m unittest discover -s tests -v
