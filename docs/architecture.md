@@ -3,6 +3,7 @@
 Implemented 2026-11-02. Scope: local evidence/storage, playlist metadata inventory,
 annotations, Takeout foundation, caching and request admission. Historical ranking
 and interest inference remain later gates in `MERGED_PROJECT_PLAN.md`.
+Selected local Chrome bookmark folders are supported as an additional private input.
 
 ## Two data boundaries
 
@@ -119,6 +120,40 @@ Missing history means unrecorded in the available export, not never watched.
 Archives are not extracted automatically; each selected file is limited to 100 MB.
 Unrecognized formats are rejected or reported without guessing; localized HTML
 and archive streaming remain future work.
+
+### Selected Chrome bookmarks
+
+`import-bookmarks SOURCE --folder NAME` accepts a local Chrome version 1 Bookmarks
+JSON file and requires explicit folder selectors. Names match case-insensitively;
+full root/folder paths disambiguate repeated names. Missing, ambiguous and
+overlapping selections are rejected before persistence. Nested folders are retained.
+Chrome's source file is opened read-only and is bounded to 100 MB. No page is fetched.
+
+The persisted source is a **filtered subset**, containing only selected trees and
+whitelisted node fields: type, name, native ID/GUID, URL, date added and date
+modified. Unrelated folders, sync metadata, arbitrary node metadata and last-used
+values are excluded. Content-addressed snapshots and import summaries remain in
+the private store, with local JSON and a searchable, light-background HTML viewer.
+
+Folder identities use Chrome GUIDs where available, with source-local fallbacks.
+Web content deduplicates by a conservative normalized URL; query strings and
+fragments remain intact. YouTube video URLs share the existing stable video ID.
+Each content/folder pair is one `saved` observation, so overlapping collections
+retain their memberships without multiplying identical entries in one folder.
+Repeated imports add evidence without duplicating those memberships or replacing
+manual reviews. Historic memberships remain after moves/deletions; the latest
+inventory report describes current membership in the selected snapshot.
+
+Dates convert Chrome's microseconds since 1601-01-01 UTC to UTC timestamps;
+invalid/zero dates remain unknown. They are bookmark dates, not publication or
+viewing dates. Unsupported URL schemes and URLs containing credentials are
+excluded from normalized observations/viewer links and counted in the private
+report. Saved interest does not imply visits, course enrollment/completion or
+current endorsement. Concept inference and public-page enrichment remain later
+work. These additions reuse schema v1 without a migration.
+
+Format/date references: Chromium's [bookmark codec](https://github.com/chromium/chromium/blob/main/components/bookmarks/browser/bookmark_codec.cc)
+and [time definitions](https://github.com/chromium/chromium/blob/main/base/time/time.h).
 
 ## Migration and rollback
 

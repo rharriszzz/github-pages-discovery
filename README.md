@@ -81,7 +81,7 @@ See `RESEARCH_PLAN.md` for survey methodology and `CODEX_PROMPT.md` for the next
 
 This repository now has a **combined research plan** for (a) learning interests from public repositories and authorized YouTube data, (b) rediscovering older videos missing from available watch history, and (c) finding new relevant GitHub Pages sites and other research. Read [`MERGED_PROJECT_PLAN.md`](MERGED_PROJECT_PLAN.md) for the integrated architecture and [`CODEX_PROMPT.md`](CODEX_PROMPT.md) for the staged implementation instructions. The older [`RESEARCH_PLAN.md`](RESEARCH_PLAN.md) remains the detailed baseline for the public GitHub Pages sampling method.
 
-**Current implementation status:** The original public pilot still has seven researched seed records. The shared private SQLite schema, Desktop read-only OAuth integration, metadata-only playlist inventory/review, Takeout JSON/HTML/CSV foundation, persistent response caches and request budgets are now implemented and tested offline. Google approval and a real playlist inventory have not run. Historical analysis, graph inference and lost-video recommendations remain later gates. See [implementation status](docs/implementation_status.md).
+**Current implementation status:** The original public pilot still has seven researched seed records. The shared private SQLite schema, Desktop read-only OAuth integration, metadata-only playlist inventory/review, Takeout JSON/HTML/CSV foundation, selected Chrome bookmark imports, persistent response caches and request budgets are implemented and tested offline. Account authorization, inventories and personal reports are handled locally; this repository publishes no account-specific results. Historical analysis, graph inference and lost-video recommendations remain later gates. See [implementation status](docs/implementation_status.md).
 
 **Data-boundary rule:** All private playlist inventories, Likes, viewing-history exports, user-specific evidence, credentials and OAuth tokens must be stored outside the Git repository. The published `docs/` site contains only reviewed public-safe data. Personal YouTube analysis belongs in a private local application, not on GitHub Pages. 
 
@@ -111,6 +111,23 @@ budgets are shared by processes using the same ledger, include failed attempts,
 honor server cooldowns and stop at batch/daily ceilings. The public GitHub/site
 clients use the same admission/cache infrastructure with separate public storage.
 Details and limitations are in [architecture](docs/architecture.md).
+
+Chrome bookmarks are another private source. Import only explicitly selected folders
+from a local Chrome profile's `Bookmarks` JSON file (not a whole-profile copy):
+
+```bash
+python3 -m pagefinder.local import-bookmarks /path/outside/git/Bookmarks --folder Study --folder Tools
+```
+
+Repeat `--folder` for each chosen folder. Names match without regard to case;
+ambiguous names require a full path such as `bookmark_bar/Study`. The importer
+preserves nested folders, titles, URLs and bookmark dates in a filtered private
+snapshot and a searchable `bookmark_inventory.html`. It deduplicates content while
+retaining separate folder memberships, reuses existing YouTube video IDs, and
+records saved interest without inferring visits, enrollment or completion.
+It makes no network requests and does not copy unrelated bookmarks, sync metadata
+or last-used data. Reruns preserve prior evidence and manual reviews. Personal
+folder names, URLs, counts and reports belong outside public Git data.
 
 ```bash
 python3 -m unittest discover -s tests -v

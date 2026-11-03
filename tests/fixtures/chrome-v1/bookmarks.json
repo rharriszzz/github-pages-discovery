@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "sync_metadata": "DO_NOT_PERSIST_PROFILE_METADATA",
+  "roots": {
+    "bookmark_bar": {
+      "type": "folder", "name": "Bookmarks bar", "guid": "synthetic-root",
+      "children": [
+        {
+          "type": "folder", "name": "Study", "guid": "synthetic-study", "date_added": "13348540800000000",
+          "meta_info": {"private": "DO_NOT_PERSIST_SELECTED_METADATA"},
+          "children": [
+            {"type": "url", "guid": "synthetic-page-a", "name": "Synthetic course", "url": "https://EXAMPLE.test:443/course", "date_added": "13348540800000000", "date_last_used": "DO_NOT_PERSIST_LAST_USED"},
+            {"type": "url", "guid": "synthetic-page-a-copy", "name": "Synthetic duplicate", "url": "https://example.test/course", "date_added": "13348627200000000"},
+            {"type": "url", "guid": "synthetic-query", "name": "Synthetic query", "url": "https://example.test/course?part=2#exercise", "date_added": "0"},
+            {"type": "folder", "guid": "synthetic-subfolder", "name": "Methods", "date_modified": "13348627200000000", "children": [
+              {"type": "url", "guid": "synthetic-video", "name": "Synthetic video", "url": "https://youtu.be/aaaaaaaaaaa", "date_added": "13348540800000000"}
+            ]},
+            {"type": "url", "guid": "synthetic-script", "name": "Excluded script", "url": "javascript:alert(1)", "date_added": "bad"},
+            {"type": "url", "guid": "synthetic-file", "name": "Excluded local file", "url": "file:///synthetic/file.txt"}
+          ]
+        },
+        {"type": "folder", "name": "Tools", "guid": "synthetic-tools", "children": [
+          {"type": "url", "guid": "synthetic-page-b", "name": "Shared course", "url": "https://example.test/course", "date_added": "13348540800000000"},
+          {"type": "url", "guid": "synthetic-page-c", "name": "<script>synthetic()</script>", "url": "https://example.test/tool", "date_added": "99999999999999999999"}
+        ]},
+        {"type": "folder", "name": "Unselected unrelated folder", "guid": "DO_NOT_PERSIST_UNSELECTED_GUID", "children": [
+          {"type": "url", "name": "DO_NOT_PERSIST_UNSELECTED_TITLE", "url": "https://unselected.invalid/private", "guid": "unselected-url"}
+        ]}
+      ]
+    }
+  }
+}

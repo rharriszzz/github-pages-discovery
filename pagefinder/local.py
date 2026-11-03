@@ -7,6 +7,7 @@ import sqlite3
 import sys
 
 from .net import BudgetExceeded, ResponseError
+from .bookmarks import import_bookmarks
 from .privacy import config_dir, data_dir, private_json
 from .research import Store
 from .takeout import import_takeout
@@ -34,6 +35,10 @@ def main(argv=None):
     imp.add_argument('source')
     imp.add_argument('--kind', choices=('history', 'likes', 'watch_later', 'playlist'), required=True)
     imp.add_argument('--playlist-id', help='Required for a reviewed curated playlist')
+    bookmarks = sub.add_parser('import-bookmarks', help='Import selected Chrome folders locally; no page requests')
+    bookmarks.add_argument('source', help='Chrome profile Bookmarks JSON file outside Git')
+    bookmarks.add_argument('--folder', action='append', required=True,
+                           help='Repeat for each folder; use root/folder path when names are ambiguous')
     rev = sub.add_parser('review', help='Persist explicit manual feedback independently of recomputation')
     rev.add_argument('entity_id')
     rev.add_argument('decision', choices=('keep', 'skip', 'later', 'already_watched', 'unknown'))
@@ -68,6 +73,12 @@ def main(argv=None):
             print('Import complete:', report['imported_observations'], 'new observations;',
                   report['duplicates'], 'duplicates;', report['unavailable_or_unrecognized'], 'unrecognized rows')
             print('Private completeness report:', folder / 'imports')
+        elif args.command == 'import-bookmarks':
+            report = import_bookmarks(store, args.source, args.folder)
+            print('Bookmarks:', report['bookmark_nodes'], 'entries;', report['unique_items'], 'unique items;',
+                  report['new_saved_memberships'], 'new saved memberships;', report['excluded'], 'excluded')
+            print('Private local viewer:', folder / 'bookmark_inventory.html')
+            print('External requests: 0. Bookmarks indicate saving; visits and completion remain unknown.')
         elif args.command == 'review':
             store.review(args.entity_id, args.decision, args.reason)
             print('Manual feedback saved locally.')

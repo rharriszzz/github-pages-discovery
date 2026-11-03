@@ -40,7 +40,9 @@ This records execution, not completion of the entire merged research plan.
 
 ## Validation and denominators
 
-43 standard-library tests passed on Python 3.14.4, including the original six.
+The original infrastructure checkpoint passed 43 standard-library tests on
+Python 3.14.4, including the original six. The bookmark extension below raises
+the current total to 52 passing tests.
 The CI workflow uses Python 3.11; that interpreter was unavailable locally.
 OAuth SDK invocation is tested with a synthetic mock against its documented
 signature; optional OAuth libraries were not installed in the base interpreter.
@@ -60,7 +62,8 @@ No live browser sign-in, token refresh or Windows-to-WSL callback is claimed.
 - Offline public regeneration: seven sites; generated HTML/CSV/JSON remain
   byte-for-byte unchanged. Publication guard and whitespace checks pass.
 
-Actual YouTube API attempts: **0**. Actual YouTube quota used: **0**.
+At that original infrastructure checkpoint, actual YouTube API attempts: **0**.
+Actual YouTube quota used: **0**.
 Real private playlists/history rows imported: **0**. Live public research API or
 site-fetch batches in this implementation run: **0**. Documentation browsing is
 separate from research API usage. There are no actual missed-video suggestions
@@ -68,7 +71,9 @@ or user evaluations yet.
 
 ## Current gate and next user action
 
-The expected Desktop `client_secret.json` was absent. Follow the
+At the original infrastructure checkpoint, the Desktop client had not yet been
+configured. Account-specific setup, inventory and annotation results are kept
+locally; this public document does not track private account state. Follow the
 [local setup](youtube_setup.md), put the downloaded Desktop client in the external
 configuration folder, and approve the read-only browser flow. Do not paste secrets
 into chat. Run the bounded inventory, then interpret playlist purposes/relevance
@@ -91,3 +96,21 @@ bulk imports. A small real Takeout source is optional and needs explicit selecti
   spend project/token quota. Provider responses always take precedence.
 
 No automatic jobs, paid models, playlist writes or playback are configured.
+
+## Additional source: selected local Chrome bookmarks
+
+Implemented a private `import-bookmarks` command using the existing schema v1.
+It requires explicit folder selection, preserves hierarchy and source dates,
+deduplicates content while retaining memberships, and writes a filtered source
+snapshot plus private JSON/HTML reports. It does not fetch linked pages or copy
+unselected bookmarks, sync data, last-used values or arbitrary metadata. Source
+files are opened read-only. Publication guards and public catalog inputs remain
+unchanged. Real source details and results are recorded only in private reports.
+
+Nine additional synthetic tests cover selection scope and missing/ambiguous/
+overlapping folders, nested paths, URL deduplication, cross-source YouTube IDs,
+date conversion, excluded schemes, metadata isolation, title escaping, CLI output,
+unchanged source/public files, repeat imports, and durable manual feedback.
+Total: **52 passing tests**. The synthetic Chrome fixture has eight bookmark
+entries, four unique valid items, five saved memberships and two excluded entries.
+No linked-page requests or new public discovery batches are part of this extension.
