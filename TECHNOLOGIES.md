@@ -76,6 +76,12 @@ Code: [creator reports](pagefinder/creators.py), [server](pagefinder/creator_ser
 
 ## GitHub and YouTube integrations
 
+Official references:
+
+- [GitHub REST API reference](https://docs.github.com/en/rest).
+- [YouTube Data API reference](https://developers.google.com/youtube/data/reference/rest).
+- [Google OAuth 2.0 for Desktop Apps](https://developers.google.com/identity/protocols/oauth2/native-app).
+
 The public GitHub client calls the REST API for bounded repository searches and
 metadata. It reads GitHub account type from API data. Authentication can come from
 `GH_TOKEN`, `GITHUB_TOKEN` or an existing GitHub CLI (`gh`) login. GitHub CLI is
