@@ -107,8 +107,9 @@ Watch-history JSON, observed English UTC/GMT history HTML, and CSV video tables
 are supported using synthetic versioned fixtures. CSV supports a preceding playlist
 metadata table. A collection kind must be selected explicitly; filenames do not
 determine engagement semantics. Curated playlist content import requires a prior
-reviewed annotation. APIs for video import/catalog expansion are intentionally
-not exposed yet.
+reviewed annotation. The creator experiment adds explicitly selected Likes/reviewed-positive playlist
+imports and bounded public metadata/upload inspection. Full historical catalog
+expansion and lost-video analysis remain future work.
 
 Time-zone-aware timestamps normalize to UTC. Ambiguous/local dates remain unknown;
 missing/deleted IDs remain in the source snapshot and exclusion counts. Same
@@ -242,3 +243,46 @@ roll back. Do not delete the quota ledger to bypass cooldowns; retain it across
 code rollbacks. No downgrade or destructive migration is performed automatically.
 
 See [setup](youtube_setup.md) and [implementation status](implementation_status.md).
+
+
+## Cross-platform creator experiment
+
+`creator_sources.py` extends the existing YouTube client with bounded, explicit
+metadata requests. Owned playlist inventory retains its old behavior. Likes and
+reviewed-positive playlist imports use the same observation identities as Takeout,
+so overlapping inputs do not multiply saved/liked events. Rating timestamps remain
+unknown; playlist addition dates are not publication dates. Channel/video selections
+have fixed caps; upload pages contain at most ten items and never create engagement.
+Arbitrary playlist requests and expensive search endpoints remain unavailable.
+The existing private NetworkState cache, pacing, quota and cooldown ledger apply.
+
+`creators.py` uses schema v1 evidence, entities, relationships, candidates,
+checkpoints and reviews. No database migration or parallel recommendation engine
+is introduced. Creator candidates, platform accounts and collaborators have
+separate identities. Official self-links/project affiliations can support verified
+records; reference links, similar names and third-party mentions cannot. Presenter
+and operator roles remain separate. Human-reviewed manifests retain all examined
+seed outcomes and content-addressed source artifacts, dates, exclusions, directions,
+request accounting and multi-work assessments. Hypothetical interest connections
+reuse existing concepts without asserting proficiency or new preferences.
+
+Identity confidence and eight assessment dimensions remain distinct. The existing
+public keyword baseline and corrected private profile are shown as comparators.
+Feedback lives in the ordinary review table with additional explicit creator
+choices; existing keep/skip/later decisions remain supported. Explicit rejection
+suppresses follow-up eligibility. Already-familiar feedback suppresses repeats
+unless a substantial new aspect is documented. Eligibility is inspectable in the
+private JSON; no calibrated ranking or automatic recursive discovery is claimed.
+
+`creator_server.py` adds the local interactive review surface to the private CLI.
+Only 127.0.0.1 binding is available; Host/Origin checks, an unpredictable per-process
+review token, bounded JSON bodies, no-store responses and fixed routes protect the
+write endpoint. It serves no arbitrary files and loads no third-party assets.
+Writes validate candidate IDs and choices before using Store.review. Regeneration
+and import preserve feedback. Offline previews download JSON for explicit feedback
+import; they do not claim browser-memory edits are durable database saves.
+
+Public export/deployment remains independent and allowlisted. Private reports and
+screenshots never enter docs/ or reports/. Restore the private-directory backup
+with the matching code for rollback; do not remove the request ledger or existing
+human reviews. The public-safe experiment findings live in reports/creator-pilot.md.

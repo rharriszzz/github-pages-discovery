@@ -1,4 +1,4 @@
-"""Read-only, metadata-only YouTube playlist inventory and local review artifacts."""
+"""Read-only YouTube metadata, bounded collection imports and local review artifacts."""
 from __future__ import annotations
 
 import csv
@@ -118,9 +118,26 @@ class YouTubeClient:
         self.state.close()
 
     def get(self, resource, params, *, fresh_after=None):
-        # This milestone intentionally cannot enumerate videos or playlist items.
-        if resource != 'playlists' or params.get('mine') != 'true':
-            raise ValueError('Only owned-playlist metadata is supported at this gate')
+        # Deliberately exclude expensive search and arbitrary authenticated endpoints.
+        allowed = resource == 'playlists' and params.get('mine') == 'true'
+        if resource == 'playlistItems':
+            annotation = self.store.db.execute(
+                'SELECT reviewed,relevance FROM playlist_annotations WHERE playlist_id=?',
+                ('youtube:playlist:' + str(params.get('playlistId', '')),)).fetchone()
+            allowed = bool(annotation and annotation['reviewed'] and annotation['relevance'] == 'positive')
+            known = self.store.get_checkpoint('creator_metadata', {}).get('channels', {})
+            allowed = allowed or any(params.get('playlistId') == row.get('item', {}).get(
+                'contentDetails', {}).get('relatedPlaylists', {}).get('uploads')
+                for row in known.values()) and bool(params.get('playlistId'))
+        if resource == 'videos':
+            allowed = params.get('myRating') == 'like' or bool(params.get('id'))
+        if resource == 'channels':
+            allowed = bool(params.get('id') or params.get('forHandle'))
+        fields = {'part', 'maxResults', 'pageToken', 'mine', 'playlistId', 'myRating', 'id', 'forHandle'}
+        if (not allowed or set(params) - fields or
+                not 1 <= int(params.get('maxResults', 50)) <= 50 or
+                len(str(params.get('id', '')).split(',')) > 50):
+            raise ValueError('Unsupported or unreviewed YouTube metadata request')
         url = BASE + resource + '?' + urlencode(sorted(params.items()))
         cached = self.state.cached(url)
         if cached and cached['status'] == 200 and (fresh_after is None or cached['fetched'] >= fresh_after):

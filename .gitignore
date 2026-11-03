@@ -16,3 +16,12 @@ token.json
 credentials.json
 *takeout*.zip
 *Takeout*.zip
+
+# Private creator experiment outputs belong outside Git; accidental-copy protection.
+creator_review.html
+creator_review.json
+creator_metadata.json
+creator_seeds.json
+creator_source_coverage.json
+creator_research_report.md
+creator-feedback*.json

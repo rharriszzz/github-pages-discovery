@@ -2,7 +2,41 @@
 
 This records execution, not completion of the entire merged research plan.
 
-## Current checkpoint
+## Cross-platform creator checkpoint
+
+An additional creator strategy is implemented on the existing private architecture.
+It preserves the broader merged plan, existing feedback, interest graph, caches,
+YouTube setup and original seven-site public catalog.
+
+- Screened 50 YouTube-first channels and eight GitHub-first seeds; deeper work
+  produced twelve private review cards with two or three projects/videos each.
+  Eleven are operator/project intersections; one is a labeled guest presenter.
+- Thirteen verified affiliation records include a sister-channel duplicate and
+  that presenter; three probable, five uncertain and 37 unmatched records remain
+  explicit. Recent software and recent video activity are assessed independently.
+- Acquisition examined 61 channel IDs and 21 GitHub accounts, including alternatives
+  and rejected matches. These exceed the seed frame and recommendation denominators.
+- Shared observations, candidates, evidence, graph links, private profile and durable
+  reviews are reused. A loopback page supports filters, decision notes, database saves
+  and an offline feedback-download/import path. Private research reports include the
+  full methodology, source trails, identity failures and next experiment.
+- 28 YouTube API attempts/units, 53 logical GitHub connector calls (six unsuccessful),
+  and 64 web-search queries. Remote connector/browser internal HTTP counts are not
+  exposed. No remote project code ran; full videos/transcripts were not assessed.
+- **78 tests pass**. Chromium desktop/mobile inspection passes with no external page
+  requests, JavaScript errors or overflow. Synthetic-data save/reload and downloads
+  pass. Public export regeneration and publication guards pass; original public
+  catalog outputs and inputs remain unchanged.
+
+GitHub-first retrieval was more productive in this adaptively selected pilot,
+but neither general superiority nor improved user usefulness is established.
+Next: collect twelve reviews, inspect selected technical examples/transcripts,
+resolve probable affiliations, then run a matched single-platform/combined-evidence
+comparison. Preserve excellent code-only and explanation-only candidates too.
+See [public-safe methodology and aggregate findings](../reports/creator-pilot.md).
+Personalized details and account-derived source records remain outside Git.
+
+## Earlier private-project checkpoint
 
 The source-ingest foundation now produces a first private, evidence-backed review
 queue. This is a useful discovery checkpoint, not completion of the research plan.

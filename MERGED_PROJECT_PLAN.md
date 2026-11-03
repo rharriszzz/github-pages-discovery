@@ -144,3 +144,19 @@ Continue a direction only if it yields *intellectually interesting, verifiable s
 ## 8. Important non-goals
 
 No exhaustive inventory of GitHub Pages or YouTube; no claim to know the user's full preferences, watch completion, real-world identity of site owners, or unseen/deleted videos; no private-data publication; no platform recommendation manipulation; no uncontrolled long-running crawls; no reliance on an external paid model without authorization; and no background process that assumes a Google login or interactive authorization succeeds unattended.
+
+
+## 9. Additional bounded strategy: creators publishing code and explanations
+
+The cross-platform creator experiment is a new open-world retrieval strategy under
+section 5B, not a replacement for interest modeling, lost-video recovery or the
+GitHub Pages survey. It reuses the private graph, evidence, caches, candidates and
+reviews. Identity/affiliation, operator versus guest-presenter role, subject/method/
+approach connections and eight assessment facets remain separate. Official links
+are necessary for verified affiliation; references and shared names are insufficient.
+
+The first execution and limitations are documented in
+[the aggregate pilot report](reports/creator-pilot.md) and implementation status.
+Personalized twelve-card review and detailed research evidence remain local. Scale
+only after user review, and test the intersection against matched code-only and
+video-only evidence rather than treating targeted retrieval yield as quality uplift.

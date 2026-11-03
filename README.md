@@ -184,3 +184,52 @@ python3 -m pagefinder.publication
 Both CI and the Pages deployment enforce the public-artifact guard. Only reviewed
 public inputs feed the catalog. Private metrics report watch minutes and viewing
 completion as `not_measurable` when the selected sources lack playback data.
+
+
+## Cross-platform creator experiment
+
+A bounded YouTube ↔ GitHub pilot now uses the shared private evidence, concept,
+candidate, cache and review stores. It adds a discovery strategy without replacing
+the public Pages catalog or lost-video work. Twelve private review cards contain
+separate assessments, official affiliation evidence, representative works and
+uncertainties. Eleven are operator/project intersections; one is explicitly a guest
+presenter comparator. Activity on each platform is assessed separately.
+
+```bash
+# Existing private data directory and authorization are reused.
+python3 -m pagefinder.local creator-review
+python3 -m pagefinder.local serve-creators --port 8766
+# Open http://127.0.0.1:8766/ ; Ctrl+C stops the service.
+```
+
+The compact light-background dashboard filters subjects, methods, seed direction
+and identity confidence. Save Already familiar / Very interesting / Somewhat
+interesting / Not interesting / Investigate later, with explanations, directly to
+the shared private SQLite review table. Offline HTML previews can download feedback
+for explicit import instead:
+
+```bash
+python3 -m pagefinder.local creator-feedback /path/outside/git/creator-feedback.json
+```
+
+`creator_review.html`, `creator_review.json`, `creator_research_report.md`, source
+snapshots and feedback stay in the private data directory. The local service exposes
+only the dashboard, its research report and the review endpoint. It binds to
+127.0.0.1, loads no external assets and never serves a repository/data directory.
+The public Pages deployment does not import these records.
+
+For a future bounded round, `creator-sources --likes --max-pages 2` or
+`creator-sources --playlist-id ID --max-pages 1` imports only the selected collection.
+Playlist access requires existing reviewed-positive annotations. `creator-seeds`
+writes the sampling frame; `creator-metadata SOURCE` accepts a private bounded JSON
+selection of channel/video IDs, handles, or cached channels' upload playlists.
+Known-channel inspection uses uploads rather than expensive search. `--offline`
+reuses caches without credentials/network; page checkpoints resume bounded imports.
+These are explicit metadata reads, never watching events. `import-creators SOURCE`
+validates a manually assessed private experiment manifest and retains raw evidence
+artifacts beside it in a content-addressed private snapshot. It does not infer
+identity from a URL or username automatically.
+
+See [pilot methodology and aggregate findings](reports/creator-pilot.md). The
+personalized full report is available through **Research report** in the local
+viewer. User-rated improvement over either platform alone remains unmeasured.

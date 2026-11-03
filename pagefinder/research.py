@@ -139,7 +139,9 @@ class Store:
         return json.loads(row[0]) if row else default
 
     def review(self, entity_id, decision, reason):
-        if decision not in ('keep', 'skip', 'later', 'already_watched', 'unknown'):
+        if decision not in ('keep', 'skip', 'later', 'already_watched', 'unknown',
+                            'already_familiar', 'very_interesting', 'somewhat_interesting',
+                            'not_interesting', 'investigate_later'):
             raise ValueError('Unsupported review decision')
         with self.db:
             eid = self.evidence('manual_review', entity_id, notes={'decision': decision, 'reason': reason})

@@ -10,6 +10,8 @@ from .net import BudgetExceeded, ResponseError
 from .bookmarks import import_bookmarks
 from .interests import import_bookshelf, import_interest_notes, set_interest_scope, write_interest_graph, DEFAULT_SOURCE
 from .candidates import import_candidate_batch, write_review_queue
+from .creator_sources import import_collection, channel_seeds, inspect_metadata
+from .creators import import_creator_batch, write_creator_review, apply_creator_feedback, DECISIONS
 from .privacy import config_dir, data_dir, private_json
 from .research import Store
 from .takeout import import_takeout
@@ -51,6 +53,27 @@ def main(argv=None):
     batch = sub.add_parser('import-candidate-batch', help='Create a private review queue from a bounded cached research batch')
     batch.add_argument('source')
     sub.add_parser('review-queue', help='Regenerate the private candidate queue with saved feedback')
+    collection = sub.add_parser('creator-sources', help='Bounded reviewed-positive playlist or recent Likes import')
+    source_group = collection.add_mutually_exclusive_group(required=True)
+    source_group.add_argument('--playlist-id')
+    source_group.add_argument('--likes', action='store_true')
+    collection.add_argument('--max-pages', type=int, default=2)
+    collection.add_argument('--max-requests', type=int, default=12)
+    collection.add_argument('--daily-units', type=int, default=100)
+    collection.add_argument('--offline', action='store_true')
+    sub.add_parser('creator-seeds', help='Build a private channel sampling frame from imported observations')
+    metadata = sub.add_parser('creator-metadata', help='Cached public metadata for a bounded private ID selection')
+    metadata.add_argument('source')
+    metadata.add_argument('--offline', action='store_true')
+    metadata.add_argument('--max-requests', type=int, default=12)
+    metadata.add_argument('--daily-units', type=int, default=100)
+    creators = sub.add_parser('import-creators', help='Import an assessed private cross-platform experiment')
+    creators.add_argument('source')
+    sub.add_parser('creator-review', help='Regenerate the private creator dashboard and research report')
+    feedback = sub.add_parser('creator-feedback', help='Import downloaded creator review decisions')
+    feedback.add_argument('source')
+    server = sub.add_parser('serve-creators', help='Serve private durable reviews on 127.0.0.1 only')
+    server.add_argument('--port', type=int, default=8766)
     scope = sub.add_parser('set-interest-scope', help='Persist an explicit private application constraint on a baseline topic')
     scope.add_argument('topic')
     scope.add_argument('--label', required=True)
@@ -61,7 +84,7 @@ def main(argv=None):
     scope.add_argument('--note', default='')
     rev = sub.add_parser('review', help='Persist explicit manual feedback independently of recomputation')
     rev.add_argument('entity_id')
-    rev.add_argument('decision', choices=('keep', 'skip', 'later', 'already_watched', 'unknown'))
+    rev.add_argument('decision', choices=tuple(dict.fromkeys(('keep', 'skip', 'later', 'already_watched', *DECISIONS))))
     rev.add_argument('--reason', required=True)
     sub.add_parser('coverage', help='Write private coverage report; never infer unmeasured progress')
     args = p.parse_args(argv)
@@ -117,6 +140,39 @@ def main(argv=None):
         elif args.command == 'review-queue':
             write_review_queue(store)
             print('Private review queue regenerated:', folder / 'discovery_queue.html')
+        elif args.command == 'creator-sources':
+            client = YouTubeClient(store, GoogleTransport(config), offline=args.offline,
+                                   max_requests=args.max_requests, daily_units=args.daily_units)
+            state = import_collection(store, client, playlist_id=args.playlist_id, likes=args.likes,
+                                      max_pages=args.max_pages)
+            print('Collection pages:', state['pages'], 'items:', state['items'], 'complete:', state['complete'])
+            print('API attempts:', client.requests, 'cache hits:', client.cache_hits)
+            print('Private channel frame:', len(channel_seeds(store)['channels']))
+        elif args.command == 'creator-seeds':
+            print('Private channel frame:', len(channel_seeds(store)['channels']))
+        elif args.command == 'creator-metadata':
+            client = YouTubeClient(store, GoogleTransport(config), offline=args.offline,
+                                   max_requests=args.max_requests, daily_units=args.daily_units)
+            report = inspect_metadata(store, client, args.source)
+            print('Cached channels:', len(report['channels']), 'videos:', len(report['videos']))
+            print('API attempts:', client.requests, 'cache hits:', client.cache_hits)
+        elif args.command == 'import-creators':
+            report = import_creator_batch(store, args.source)
+            print('Creator investigations:', report['metrics']['investigations'])
+            print('Review candidates:', report['metrics']['recommendations'])
+            print('Private viewer:', folder / 'creator_review.html')
+        elif args.command == 'creator-review':
+            write_creator_review(store)
+            print('Private viewer:', folder / 'creator_review.html')
+        elif args.command == 'creator-feedback':
+            from .creators import _read
+            apply_creator_feedback(store, json.loads(_read(args.source)))
+            print('Creator feedback saved in the shared private review store.')
+        elif args.command == 'serve-creators':
+            from .creator_server import serve_creators
+            store.close()
+            store = None
+            serve_creators(folder, args.port)
         elif args.command == 'set-interest-scope':
             set_interest_scope(store, args.topic, args.label, args.context,
                                project_status=args.project_status, note=args.note, mode=args.mode)
@@ -127,6 +183,8 @@ def main(argv=None):
                 write_interest_graph(store)
             if store.get_checkpoint('active_candidate_batch'):
                 write_review_queue(store)
+            if store.get_checkpoint('active_creator_batch'):
+                write_creator_review(store)
             print('Manual feedback saved locally.')
         else:
             private_json(folder / 'evidence_coverage.json', store.coverage())
