@@ -3,6 +3,7 @@ import http.client
 import json
 from pathlib import Path
 import re
+import socketserver
 import tempfile
 import threading
 import unittest
@@ -109,6 +110,103 @@ class CreatorTests(unittest.TestCase):
         self.assertIn("frame-src 'none'", page)
         self.assertIn('no-referrer', page)
 
+    def test_collection_migrates_active_pilot_and_merges_batches_without_losing_reviews(self):
+        first = import_creator_batch(self.store, self.source)
+        # Model a legacy installation with only its active checkpoint.
+        with self.store.db:
+            self.store.db.execute("DELETE FROM checkpoints WHERE key='creator_collection'")
+        apply_creator_feedback(self.store, {'version': 1, 'reviews': [
+            {'entity_id': 'creator:synthetic', 'decision': 'already_familiar', 'reason': 'Keep my note'}]})
+        original = tuple(self.store.db.execute('SELECT * FROM reviews').fetchone())
+        second = batch(); second['round_id'] = 'expansion'
+        second['investigated'][0].update(id='creator:new', name='New')
+        self.source.write_text(json.dumps(second))
+        report = import_creator_batch(self.store, self.source)
+        self.assertEqual(report['metrics']['recommendations'], 2)
+        self.assertEqual(report['metrics']['rounds']['pilot']['recommendations'], 1)
+        self.assertEqual(report['metrics']['rounds']['expansion']['recommendations'], 1)
+        self.assertEqual(tuple(self.store.db.execute('SELECT * FROM reviews').fetchone()), original)
+        report = import_creator_batch(self.store, self.source)
+        self.assertEqual(len(report['rounds']), 2)
+        self.assertEqual(len(report['investigated']), 2)
+        self.assertIn('roundId', render_review(report))
+        self.assertIn('Unexpected discoveries', render_review(report))
+        # Revising an old investigation must retain the original review and first round.
+        second['investigated'][0].update(id='creator:synthetic', new_aspect='New method')
+        self.source.write_text(json.dumps(second))
+        report = import_creator_batch(self.store, self.source)
+        row = next(r for r in report['investigated'] if r['id'] == 'creator:synthetic')
+        self.assertEqual(row['first_round'], 'pilot')
+        self.assertEqual(row['review']['reason'], 'Keep my note')
+
+    def test_large_feedback_export_does_not_create_or_rewrite_untouched_reviews(self):
+        data = batch(); data['investigated'] *= 0
+        for i in range(75):
+            row = batch()['investigated'][0]; row['id'] = 'creator:synthetic' + str(i)
+            data['investigated'].append(row)
+        self.source.write_text(json.dumps(data)); import_creator_batch(self.store, self.source)
+        data['investigated'] = [dict(batch()['investigated'][0], id='creator:last')]
+        self.source.write_text(json.dumps(data)); import_creator_batch(self.store, self.source)
+        payload = {'version': 1, 'reviews': [dict(entity_id=r['id'], decision='unknown', reason='')
+                    for r in creator_report(self.store)['investigated']]}
+        apply_creator_feedback(self.store, payload)
+        self.assertEqual(self.store.coverage()['counts']['reviews'], 0)
+        payload['reviews'][0].update(decision='very_interesting', reason='Useful')
+        apply_creator_feedback(self.store, payload)
+        original = tuple(self.store.db.execute('SELECT * FROM reviews').fetchone())
+        apply_creator_feedback(self.store, payload)
+        self.assertEqual(tuple(self.store.db.execute('SELECT * FROM reviews').fetchone()), original)
+
+    def test_single_platform_comparisons_never_become_operator_intersections(self):
+        for kind, omitted in [('youtube_only', 'projects'), ('github_only', 'videos')]:
+            data = batch(); row = data['investigated'][0]
+            row.update(identity='no_match', comparison_kind=kind)
+            row[omitted] = []
+            validate_batch(data)
+            row.update(intersection_qualified=True, channel_role='operator')
+            with self.assertRaises(ValueError): validate_batch(data)
+
+    def test_feedback_batch_rolls_back_on_database_write_failure(self):
+        data = batch()
+        data['investigated'].append(dict(deepcopy(data['investigated'][0]), id='creator:second'))
+        self.source.write_text(json.dumps(data)); import_creator_batch(self.store, self.source)
+        original_review = self.store.review
+        calls = []
+        def fail_second(*args, **kwargs):
+            calls.append(args)
+            if len(calls) == 2:
+                raise RuntimeError('Synthetic write failure')
+            return original_review(*args, **kwargs)
+        payload = {'version': 1, 'reviews': [dict(entity_id=r['id'], decision='very_interesting', reason='Synthetic')
+                    for r in data['investigated']]}
+        with patch.object(self.store, 'review', side_effect=fail_second):
+            with self.assertRaises(RuntimeError): apply_creator_feedback(self.store, payload)
+        self.assertEqual(self.store.coverage()['counts']['reviews'], 0)
+
+    def test_concept_provenance_is_durable_and_does_not_assert_user_novelty(self):
+        data = batch(); data['investigated'][0]['learning_concepts'] = [
+            {'label': 'Synthetic method', 'explanation': 'Bounded example', 'sources': ['https://example.org/method']}]
+        self.source.write_text(json.dumps(data)); report = import_creator_batch(self.store, self.source)
+        self.assertEqual(report['metrics']['learning_concepts'], 1)
+        evidence = self.store.db.execute("SELECT notes FROM evidence WHERE source_type='creator_concept'").fetchone()
+        self.assertEqual(json.loads(evidence['notes'])['novelty'], 'awaits_user_review')
+        html = render_review(report)
+        self.assertIn('Learning concepts', html)
+        self.assertIn('Synthetic method</b>: Bounded example', html)
+        self.assertIn('https://example.org/method', html)
+        data['investigated'][0]['learning_concepts'][0]['sources'] = ['javascript:bad']
+        with self.assertRaises(ValueError): validate_batch(data)
+
+    def test_probable_recommendation_is_explicit_and_never_an_operator_intersection(self):
+        data = batch(); row = data['investigated'][0]; row['identity'] = 'probable'
+        validate_batch(data)
+        row.update(intersection_qualified=True, channel_role='operator')
+        with self.assertRaises(ValueError): validate_batch(data)
+
+    def test_server_preflight_rejects_missing_collection_before_advertising_url(self):
+        with self.assertRaisesRegex(ValueError, 'Import a creator'):
+            make_server(self.store.folder, 0)
+
     def test_loopback_server_saves_durably_and_rejects_foreign_origins_and_paths(self):
         import_creator_batch(self.store, self.source)
         server = make_server(self.store.folder, 0)
@@ -136,6 +234,44 @@ class CreatorTests(unittest.TestCase):
             self.assertEqual(response.status,403)
         finally:
             conn.close();server.shutdown();server.server_close();thread.join()
+
+    def test_response_disconnects_do_not_log_errors_or_break_next_request(self):
+        import_creator_batch(self.store, self.source)
+        write = socketserver._SocketWriter.write
+        for error in (BrokenPipeError, ConnectionResetError):
+            for phase in ('headers', 'body'):
+                with self.subTest(error=error.__name__, phase=phase):
+                    server = make_server(self.store.folder, 0)
+                    server.timeout = 2
+                    conn = http.client.HTTPConnection('127.0.0.1', server.server_port, timeout=2)
+                    calls = []
+
+                    def interrupted_write(stream, data):
+                        calls.append(data)
+                        if len(calls) == (1 if phase == 'headers' else 2):
+                            raise error()
+                        return write(stream, data)
+
+                    try:
+                        conn.request('GET', '/')
+                        with patch('socketserver._SocketWriter.write', interrupted_write), \
+                                patch.object(server, 'handle_error') as handle_error:
+                            server.handle_request()
+                        self.assertEqual(len(calls), 1 if phase == 'headers' else 2)
+                        handle_error.assert_not_called()
+                        with self.assertRaises((http.client.RemoteDisconnected, http.client.IncompleteRead)):
+                            conn.getresponse().read()
+                        conn.close()
+                        conn.request('GET', '/')
+                        server.handle_request()
+                        response = conn.getresponse()
+                        body = response.read()
+                        self.assertEqual(response.status, 200)
+                        self.assertEqual(len(body), int(response.getheader('Content-Length')))
+                        self.assertIn(b'Private creator review', body)
+                    finally:
+                        conn.close()
+                        server.server_close()
 
 
 class CreatorSourceTests(unittest.TestCase):
@@ -189,3 +325,17 @@ class CreatorSourceTests(unittest.TestCase):
         source.write_text(json.dumps({'uploads':['UC'+'b'*22]}))
         inspect_metadata(self.store,self.client,source)
         self.assertEqual(len(self.calls),1)
+
+    def test_missing_handle_is_checkpointed_without_stopping_other_lookups(self):
+        source = self.folder / 'handles.json'; source.write_text(json.dumps({'handles': ['missing', 'present']}))
+        def transport(url):
+            if 'forHandle=missing' in url:
+                return 200, {}, {'kind': 'youtube#channelListResponse'}
+            return 200, {}, {'items': [{'id': 'UC' + 'b' * 22, 'snippet': {'title': 'Synthetic'}}]}
+        self.client.transport = transport
+        report = inspect_metadata(self.store, self.client, source)
+        self.assertEqual(report['lookups']['missing']['channel_ids'], [])
+        self.assertEqual(report['lookups']['present']['channel_ids'], ['UC' + 'b' * 22])
+        self.client.offline = True
+        inspect_metadata(self.store, self.client, source)
+        self.assertEqual(self.client.requests, 2)

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from contextlib import nullcontext
 import hashlib
 import json
 from pathlib import Path
@@ -138,12 +139,12 @@ class Store:
         row = self.db.execute('SELECT value FROM checkpoints WHERE key=?', (key,)).fetchone()
         return json.loads(row[0]) if row else default
 
-    def review(self, entity_id, decision, reason):
+    def review(self, entity_id, decision, reason, *, transaction=True):
         if decision not in ('keep', 'skip', 'later', 'already_watched', 'unknown',
                             'already_familiar', 'very_interesting', 'somewhat_interesting',
                             'not_interesting', 'investigate_later'):
             raise ValueError('Unsupported review decision')
-        with self.db:
+        with self.db if transaction else nullcontext():
             eid = self.evidence('manual_review', entity_id, notes={'decision': decision, 'reason': reason})
             self.db.execute('INSERT INTO reviews VALUES (?,?,?,?,?) ON CONFLICT(entity_id) '
                             'DO UPDATE SET decision=excluded.decision,reason=excluded.reason,'

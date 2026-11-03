@@ -1,8 +1,10 @@
 from contextlib import closing, redirect_stderr, redirect_stdout
+import errno
 import io
 import json
 from pathlib import Path
 import shutil
+import sqlite3
 import tempfile
 import types
 import unittest
@@ -49,6 +51,40 @@ class LocalCLITests(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(json.loads(out)['counts']['observations'], 4)
         self.assertEqual(self.invoke(['review', 'youtube:video:aaaaaaaaaaa', 'keep', '--reason', 'Synthetic method'])[0], 0)
+
+    def test_startup_errors_are_actionable_without_leaking_private_details(self):
+        private = 'PRIVATE_TITLE_TOKEN_PATH'
+        cases = [
+            (OSError(errno.EROFS, private, private), 'read-only', 'EROFS'),
+            (PermissionError(errno.EACCES, private, private), 'Permission denied', 'EACCES'),
+            (PermissionError(errno.EPERM, private, private), 'sandbox restrictions', 'EPERM'),
+            (FileNotFoundError(errno.ENOENT, private, private), 'not found', 'ENOENT'),
+            (OSError(errno.ENOSPC, private, private), 'No space left', 'ENOSPC'),
+            (OSError(errno.EIO, private, private), 'Filesystem or local socket', 'EIO'),
+            (OSError(private), 'Filesystem or local socket', ''),
+            (sqlite3.OperationalError(private), 'Private SQLite operation failed', ''),
+            (json.JSONDecodeError(private, private, 0), 'Check input format', ''),
+        ]
+        for exc, message, code in cases:
+            with self.subTest(error=type(exc).__name__, code=code):
+                with patch('pagefinder.local.Store', side_effect=exc):
+                    result, out, err = self.invoke(['serve-creators'])
+                self.assertEqual(result, 2)
+                self.assertIn(message, err)
+                self.assertIn(code, err)
+                self.assertNotIn(private, out + err)
+                self.assertNotIn(str(self.data), out + err)
+
+    def test_busy_server_port_reports_recovery_and_closes_the_store(self):
+        with patch('pagefinder.local.Store') as store, patch(
+                'pagefinder.creator_server.serve_creators',
+                side_effect=OSError(errno.EADDRINUSE, 'PRIVATE_SERVER_DETAILS')):
+            result, out, err = self.invoke(['serve-creators', '--port', '8766'])
+        self.assertEqual(result, 2)
+        self.assertIn('EADDRINUSE', err)
+        self.assertIn('--port 8767', err)
+        self.assertNotIn('PRIVATE_SERVER_DETAILS', out + err)
+        store.return_value.close.assert_called_once_with()
 
     def test_auth_is_desktop_readonly_pkce_loopback_and_does_not_print_secrets(self):
         self.config.mkdir()

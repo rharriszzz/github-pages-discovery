@@ -188,12 +188,11 @@ completion as `not_measurable` when the selected sources lack playback data.
 
 ## Cross-platform creator experiment
 
-A bounded YouTube ↔ GitHub pilot now uses the shared private evidence, concept,
-candidate, cache and review stores. It adds a discovery strategy without replacing
-the public Pages catalog or lost-video work. Twelve private review cards contain
-separate assessments, official affiliation evidence, representative works and
-uncertainties. Eleven are operator/project intersections; one is explicitly a guest
-presenter comparator. Activity on each platform is assessed separately.
+The private creator collection now contains the original twelve pilot cards and
+40 additional recommendations from 150 new YouTube-first and 51 new GitHub-first
+screens. Earlier cards, source snapshots and saved reviews are retained. Verified,
+probable, guest-presenter, teaching-materials and single-platform cases remain
+explicit. New research does not imply prior unfamiliarity or improved relevance.
 
 ```bash
 # Existing private data directory and authorization are reused.
@@ -202,9 +201,17 @@ python3 -m pagefinder.local serve-creators --port 8766
 # Open http://127.0.0.1:8766/ ; Ctrl+C stops the service.
 ```
 
-The compact light-background dashboard filters subjects, methods, seed direction
-and identity confidence. Save Already familiar / Very interesting / Somewhat
-interesting / Not interesting / Investigate later, with explanations, directly to
+If startup reports `EROFS`, the private data directory is read-only to the process.
+Run the command in your normal terminal or allow the sandbox to write to the
+existing private data directory. `EACCES` or `EPERM` indicates a permissions or
+sandbox restriction on private files or local sockets. `EADDRINUSE` means the port
+is occupied; use `--port 8767` and open `http://127.0.0.1:8767/` instead.
+
+The dashboard separates familiar interests and unexpected connections, with new
+cards first. Combine subject, method, direction, affiliation, round, review-status
+and platform filters with search. Expand representative works and explanations
+on demand. Save Already familiar / Very interesting / Somewhat interesting /
+Not interesting / Investigate later, with notes, directly to
 the shared private SQLite review table. Offline HTML previews can download feedback
 for explicit import instead:
 
@@ -226,10 +233,15 @@ selection of channel/video IDs, handles, or cached channels' upload playlists.
 Known-channel inspection uses uploads rather than expensive search. `--offline`
 reuses caches without credentials/network; page checkpoints resume bounded imports.
 These are explicit metadata reads, never watching events. `import-creators SOURCE`
-validates a manually assessed private experiment manifest and retains raw evidence
-artifacts beside it in a content-addressed private snapshot. It does not infer
-identity from a URL or username automatically.
+validates a manually assessed private manifest (1–75 investigations per batch),
+retains content-addressed evidence and merges it into the cumulative collection.
+Stable IDs keep reviews attached; a later assessed revision can update a card
+without deleting its earlier snapshot. Feedback imports accept up to 1,000 rows,
+validate before writing and commit atomically. Unchanged and untouched reviews
+retain their original state and timestamps. Identity is never inferred from a
+URL or username automatically.
 
-See [pilot methodology and aggregate findings](reports/creator-pilot.md). The
+See the preserved [pilot](reports/creator-pilot.md) and the
+[expanded methodology and aggregate findings](reports/creator-expanded.md). The
 personalized full report is available through **Research report** in the local
 viewer. User-rated improvement over either platform alone remains unmeasured.

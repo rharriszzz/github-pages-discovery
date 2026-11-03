@@ -8,17 +8,22 @@ if (!online) for (const el of document.querySelectorAll('#refresh,.serverlink'))
 function filter() {
   const q = document.querySelector('#search').value.toLowerCase();
   for (const c of [...cards, ...investigations]) {
-    c.hidden = !c.textContent.toLowerCase().includes(q) || ['subject', 'method', 'direction', 'confidence'].some(k => {
+    c.hidden = !c.textContent.toLowerCase().includes(q) || ['subject', 'method', 'direction', 'confidence', 'roundId', 'reviewStatus', 'connectionGroup', 'platform'].some(k => {
       const v = document.getElementById(k).value;
       if (!v) return false;
       return k === 'subject' || k === 'method' ? !JSON.parse(c.dataset[k + 's']).includes(v) : c.dataset[k] !== v;
     });
   }
+  for (const group of document.querySelectorAll('.collection-group')) group.hidden = ![...group.querySelectorAll('article')].some(c => !c.hidden);
   if (document.querySelector('#confidence').value && document.querySelector('#confidence').value !== 'verified') document.querySelector('.audit').open = true;
   document.querySelector('#count').textContent = `${cards.filter(c => !c.hidden).length} of ${cards.length} candidates shown · ${investigations.filter(c => !c.hidden).length} investigations match`;
 }
 for (const el of document.querySelectorAll('.filters input,.filters select')) el.addEventListener('input', filter);
 filter();
+document.querySelector('#reset-filters').addEventListener('click', () => {
+  for (const el of document.querySelectorAll('.filters input,.filters select')) el.value = '';
+  filter();
+});
 for (const card of cards) {
   const output = card.querySelector('output');
   const button = card.querySelector('.save');
@@ -37,6 +42,9 @@ for (const card of cards) {
       const res = await fetch('/api/review', {method: 'POST', headers: {'Content-Type': 'application/json', 'X-Review-Token': BOOTSTRAP.token}, body: JSON.stringify({version: 1, reviews: [row]})});
       if (!res.ok) throw Error('Request failed');
       saved[row.entity_id] = row;
+      const reviewed = card.dataset.reviewStatus === 'reviewed' || row.decision !== 'unknown' || Boolean(row.reason);
+      card.dataset.reviewStatus = reviewed ? 'reviewed' : 'unreviewed';
+      card.querySelector('.review-status').textContent = card.dataset.reviewStatus;
       output.textContent = 'Saved to private store';
     } catch (_) { output.textContent = 'Save failed; your text is still here. Retry or download feedback.'; }
     finally { button.disabled = false; }

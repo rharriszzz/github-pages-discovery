@@ -1,4 +1,34 @@
-# Implementation status — 2026-11-02
+# Implementation status — 2026-11-03
+
+## Expanded creator discovery checkpoint
+
+- Screened 150 new YouTube-first channels and 51 new GitHub-first canonical
+  account/collective leads in checkpointed batches. Produced 40 new multi-work
+  cards alongside the original twelve; the private dashboard now has 52 cards.
+- Thirty new cross-platform affiliations are verified and one remains probable.
+  Nine additional cards are labeled single-platform comparisons. Twenty-seven
+  meet the stricter verified operator/software intersection definition; guest
+  presenters and teaching slides remain distinct.
+- Source-linked concepts, role-specific neighborhood trails and explicit
+  limitations accompany the recommendations. Existing private reviews and the
+  original experiment survive intact. New research does not establish novelty,
+  and expanded relevance has not yet received human evaluation.
+- The dashboard supports cumulative batches, round/review/platform filters,
+  separate connection sections, expandable works/evidence and atomic durable
+  feedback. Startup preflight and WSL2 recovery diagnostics are implemented.
+- Research accounting: 116 YouTube attempt reservations (six transport failures),
+  192 logical GitHub connector calls and 26 web-search queries. Remote/internal
+  request counts are not exposed. Exact-ID metadata replaced throttled embeds.
+- **89 tests pass**; Chromium desktop/mobile review and feedback workflow pass.
+  Windows PowerShell reaches the WSL2 server with HTTP 200. Original public
+  catalog regeneration, publication guards and whitespace checks pass.
+
+See [expanded methodology and aggregate results](../reports/creator-expanded.md).
+All creator identities, personalized source trails, reviews, account data,
+screenshots and raw research remain outside Git. The earlier checkpoints below
+retain their original scope and evaluation status.
+
+# Earlier implementation status — 2026-11-02
 
 This records execution, not completion of the entire merged research plan.
 

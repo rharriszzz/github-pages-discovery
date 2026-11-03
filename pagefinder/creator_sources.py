@@ -120,6 +120,7 @@ def inspect_metadata(store, client, source):
     if not isinstance(uploads, list) or len(uploads) > 15 or any(c not in report['channels'] for c in uploads):
         raise ValueError('Upload sampling needs at most 15 previously inspected channel IDs')
     report.setdefault('uploads', {})
+    report.setdefault('lookups', {})
     requests = []
     for resource, values in (('channels', channels), ('videos', videos)):
         for i in range(0, len(values), 50):
@@ -133,9 +134,19 @@ def inspect_metadata(store, client, source):
     try:
         for resource, params in requests:
             response = client.get(resource, params)
+            # A valid channel-list response may omit items for an unknown handle.
+            # Record the miss and continue this bounded batch; never infer identity.
+            if (resource == 'channels' and params.get('forHandle') and
+                    response['body'].get('kind') == 'youtube#channelListResponse' and
+                    'items' not in response['body']):
+                response = {**response, 'body': {**response['body'], 'items': []}}
             if not isinstance(response['body'].get('items'), list):
                 raise ValueError('Metadata response lacks items')
             with store.db:
+                if params.get('forHandle'):
+                    report['lookups'][params['forHandle']] = {
+                        'channel_ids': [x['id'] for x in response['body']['items']],
+                        'fetched_at': response['fetched']}
                 if resource == 'playlistItems':
                     channel = next(c for c in uploads if report['channels'][c]['item']['contentDetails']['relatedPlaylists']['uploads'] == params['playlistId'])
                     report['uploads'][channel] = {'items': response['body']['items'], 'fetched_at': response['fetched'],

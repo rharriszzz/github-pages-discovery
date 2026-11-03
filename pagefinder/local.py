@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import errno
 import json
 import sqlite3
 import sys
@@ -16,6 +17,35 @@ from .privacy import config_dir, data_dir, private_json
 from .research import Store
 from .takeout import import_takeout
 from .youtube import GoogleTransport, YouTubeClient, annotate, authenticate, inventory
+
+
+def _safe_error_message(exc):
+    # File/parser/database errors may contain private paths, titles or credentials.
+    # Only application-authored messages and fixed OS error names are safe to print.
+    if isinstance(exc, (BudgetExceeded, ResponseError)) or type(exc) is ValueError:
+        return str(exc)
+    if isinstance(exc, OSError):
+        messages = {
+            errno.EROFS: 'Private storage is read-only. Run from a terminal with write access '
+                         'to the private data directory, or allow that access in the sandbox.',
+            errno.EACCES: 'Permission denied. Check access to private files and permission '
+                          'to bind a loopback socket when starting a local server.',
+            errno.EPERM: 'Operation not permitted. Check sandbox restrictions and permissions '
+                         'for private storage and local sockets.',
+            errno.EADDRINUSE: 'Local port is already in use. For serve-creators, choose another '
+                              '--port (for example, --port 8767), or stop the existing server.',
+            errno.ENOENT: 'Required file or directory was not found. Check input paths '
+                          'and setup instructions.',
+            errno.ENOSPC: 'No space left on the device. Free space on the private storage device.',
+        }
+        message = messages.get(exc.errno, 'Filesystem or local socket operation failed. '
+                               'Check private paths, permissions and setup instructions.')
+        code = errno.errorcode.get(exc.errno)
+        return f'{message} ({code})' if code else message
+    if isinstance(exc, sqlite3.Error):
+        return ('Private SQLite operation failed. Check database permissions, available space '
+                'and whether another process is holding a database lock.')
+    return 'Check input format, private paths, permissions and setup instructions.'
 
 
 def main(argv=None):
@@ -189,15 +219,8 @@ def main(argv=None):
         else:
             private_json(folder / 'evidence_coverage.json', store.coverage())
             print(json.dumps(store.coverage(), indent=2))
-    except (ValueError, OSError, sqlite3.Error, BudgetExceeded, ResponseError):
-        # File/parser errors can include private titles, paths and raw credential fields.
-        # Known application messages are constructed without source content.
-        exc = sys.exception() if hasattr(sys, 'exception') else sys.exc_info()[1]
-        if isinstance(exc, (BudgetExceeded, ResponseError)) or type(exc) is ValueError:
-            message = str(exc)
-        else:
-            message = 'Check input format, private paths, permissions and setup instructions.'
-        print('Stopped safely: ' + message, file=sys.stderr)
+    except (ValueError, OSError, sqlite3.Error, BudgetExceeded, ResponseError) as exc:
+        print('Stopped safely: ' + _safe_error_message(exc), file=sys.stderr)
         return 2
     finally:
         if client:
