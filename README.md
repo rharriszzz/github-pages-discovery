@@ -1,10 +1,35 @@
 # GitHub Pages Interest Finder
 
-A conservative research tool for discovering public `*.github.io` websites, identifying whether the **GitHub account** is a `User` or an `Organization`, and estimating overlap with a user-editable set of technical and creative interests.
+A research tool for discovering interesting GitHub Pages sites, YouTube creators,
+software projects and connections among technical and creative subjects. It
+combines a public site catalog with private local research and creator reviews.
 
-**Status:** Working starter implementation and **seven manually researched sample records**, not a comprehensive survey. The sample account types were verified against GitHub repository metadata on 2026-11-02. The local HTTP crawler has not yet been run against the entire sample; those records are marked `research_preview` rather than pretending to be fresh automatic HTTP checks.
+**Current status:** The public catalog contains seven manually researched sample
+sites. The private creator dashboard supports 52 recommendations: the original
+twelve plus 40 from the expanded discovery round. It provides linked projects,
+videos, learning concepts, filters and saved feedback. Research is bounded and
+partly curated; recommendation usefulness and concept novelty require human
+evaluation. See [implementation status](docs/implementation_status.md) for details.
 
-## What the tool does
+**Private data stays local.** YouTube account data, personal profiles, research
+evidence, reviews and credentials belong outside Git. GitHub Pages publishes only
+the reviewed public catalog and documentation.
+
+## Start here
+
+| Goal | Where to start |
+| --- | --- |
+| Browse or regenerate the public site catalog | [Quick start](#quick-start-python-311-standard-library-only) |
+| Review the existing creator recommendations | [Creator dashboard](#cross-platform-creator-experiment) |
+| Set up private YouTube research | [Private local research](#private-local-research) and [YouTube setup](docs/youtube_setup.md) |
+| Understand the technology choices | [Major technologies](TECHNOLOGIES.md) |
+| Read the design and research results | [Architecture](docs/architecture.md), [current status](docs/implementation_status.md) and [expanded experiment](reports/creator-expanded.md) |
+
+## Public catalog capabilities
+
+The checked-in sample is a starting point rather than a comprehensive survey.
+Its hand-researched records are labeled `research_preview`; those labels do not
+claim a fresh automated HTTP check.
 
 - Discover candidate sites through **bounded GitHub repository searches**. Results may include personal/organization sites (`owner.github.io`) or project sites (`owner.github.io/repository/`). Each candidate is *only a candidate* until the page is checked.
 - Read GitHub account classification from the GitHub API's `type` field, never from the visual style of the site. `User` means an individual-account *type*, **not proof of the number or identity of maintainers**. `Organization` does not imply a company, and can be a one-person project.
@@ -16,13 +41,21 @@ A conservative research tool for discovering public `*.github.io` websites, iden
 ## Quick start (Python 3.11+, standard library only)
 
 ```bash
-python -m unittest discover -s tests -v
-python -m pagefinder stats
-python -m pagefinder report
+python3 -m pagefinder stats
+python3 -m pagefinder report
 # Open docs/index.html in a browser.
 ```
 
-These commands do not require network access.
+Run these commands from the repository directory. They use Python 3.11 or newer,
+require no third-party packages and do not access the network. For the private
+review interface, see the [creator dashboard](#cross-platform-creator-experiment).
+
+To check the implementation and public export boundary:
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m pagefinder.publication
+```
 
 ## Optional discovery / enrichment
 
@@ -30,20 +63,20 @@ Use a local GitHub CLI login (`gh auth login`) or an environment `GH_TOKEN` / `G
 
 ```bash
 # 1. Discover candidate site URLs. Results are checkpointed to data/sites.json.
-python -m pagefinder discover --queries-file data/search_queries.txt --per-page 30 --pages 1
+python3 -m pagefinder discover --queries-file data/search_queries.txt --per-page 30 --pages 1
 
 # 2. Validate a small, bounded batch. May make HTTPS requests.
-python -m pagefinder enrich --max-sites 20
+python3 -m pagefinder enrich --max-sites 20
 
 # 3. Rank and export.
-python -m pagefinder report
+python3 -m pagefinder report
 ```
 
 The order of records affects enrichment. Review the first batch before increasing `--max-sites`; a very large broad search is not yet recommended. Search API queries are intentionally capped, and truncation is reported; **no completeness claim is justified**.
 
 For a completely offline cached run, pass `--offline` to `discover` or `enrich` (the `report` command is always offline). Enrichment of an existing successful (`ok`) site is skipped. Adjust the raw sample in `data/sites.json` only if you understand the schema.
 
-## Outputs
+## Public catalog files
 
 - `docs/index.html` — accessible light-background catalog with search and account-type filter; deployable through GitHub Pages.
 - `reports/results.csv` — sortable / spreadsheet-compatible result export.
@@ -54,7 +87,12 @@ For a completely offline cached run, pass `--offline` to `discover` or `enrich` 
 
 ## GitHub Pages deployment
 
-Create an empty repository, suggested name `github-pages-discovery`, and push this project's files to `main`. In **Settings → Pages → Build and deployment → Source**, choose **GitHub Actions**. `.github/workflows/pages.yml` deploys the checked-in `docs/` folder on future pushes. No crawler is run by the Pages workflow. The expected URL is `https://rharriszzz.github.io/github-pages-discovery/` after GitHub reports a successful deployment.
+The [Pages workflow](.github/workflows/pages.yml) validates public artifacts and
+deploys the checked-in `docs/` folder on pushes to `main`. It runs no crawler or
+private imports. The catalog URL is
+[rharriszzz.github.io/github-pages-discovery](https://rharriszzz.github.io/github-pages-discovery/)
+after a successful deployment. To configure a fork, choose **GitHub Actions** in
+**Settings → Pages → Build and deployment → Source**.
 
 The Pages site is public: avoid committing anything you consider private. The shipped interest profile describes research topics and is editable; it contains no API tokens, private messages or personal contact details.
 
@@ -75,13 +113,24 @@ The Pages site is public: avoid committing anything you consider private. The sh
 - [GitHub REST search endpoint limitations](https://docs.github.com/en/rest/search/search)
 - [Common Crawl statistics](https://commoncrawl.github.io/cc-crawl-statistics/plots/domains)
 
-See `RESEARCH_PLAN.md` for survey methodology and `CODEX_PROMPT.md` for the next development task.
+See [the research plan](RESEARCH_PLAN.md) for survey methodology and
+[development instructions](CODEX_PROMPT.md) for the staged research workflow.
 
-## Unified research direction (2026-11-02)
+## Project scope and current status
 
-This repository now has a **combined research plan** for (a) learning interests from public repositories and authorized YouTube data, (b) rediscovering older videos missing from available watch history, and (c) finding new relevant GitHub Pages sites and other research. Read [`MERGED_PROJECT_PLAN.md`](MERGED_PROJECT_PLAN.md) for the integrated architecture and [`CODEX_PROMPT.md`](CODEX_PROMPT.md) for the staged implementation instructions. The older [`RESEARCH_PLAN.md`](RESEARCH_PLAN.md) remains the detailed baseline for the public GitHub Pages sampling method.
+The [combined research plan](MERGED_PROJECT_PLAN.md) connects interest discovery,
+rediscovery of older videos missing from available history, and recommendations
+of sites, creators and projects. [Development instructions](CODEX_PROMPT.md)
+describe the staged workflow; the [original research plan](RESEARCH_PLAN.md)
+retains the detailed public-site sampling method.
 
-**Current implementation status:** The original public pilot still has seven researched seed records. The shared private SQLite schema, Desktop read-only OAuth integration, metadata-only playlist inventory/review, Takeout JSON/HTML/CSV foundation, selected Chrome bookmark imports, curated bookshelf concept mapping, persistent response caches and request budgets are implemented and tested offline. Account authorization, inventories, interest graphs and personal reports are handled locally; this repository publishes no private account records. Historical analysis, automated graph inference, calibrated ranking and lost-video recommendations remain later gates. See [implementation status](docs/implementation_status.md).
+The implementation includes private SQLite evidence storage, read-only Desktop
+OAuth, playlist inventory/review, selected Takeout and Chrome bookmark imports,
+curated concept mapping, persistent response caches and request budgets. The
+creator dashboard adds cumulative research batches, affiliation evidence,
+expandable explanations and durable feedback while preserving earlier reviews.
+Historical analysis, automated graph inference, calibrated ranking and lost-video
+recommendations remain future work. See [implementation status](docs/implementation_status.md).
 
 **Data-boundary rule:** All private playlist inventories, Likes, viewing-history exports, user-specific evidence, credentials and OAuth tokens must be stored outside the Git repository. The published `docs/` site contains only reviewed public-safe data. Personal YouTube analysis belongs in a private local application, not on GitHub Pages. 
 
