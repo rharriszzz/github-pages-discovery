@@ -91,12 +91,19 @@ For a completely offline cached run, pass `--offline` to `discover` or `enrich` 
 
 ## GitHub Pages deployment
 
-The [Pages workflow](.github/workflows/pages.yml) validates public artifacts and
-deploys the checked-in `docs/` folder on pushes to `main`. It runs no crawler or
-private imports. The catalog URL is
+The [Pages workflow](.github/workflows/pages.yml) validates public artifacts on
+pushes to `main` and deploys the checked-in `docs/` folder when Pages is enabled.
+When Pages is disabled, validation still runs and the workflow explicitly skips
+publishing. API failures and errors deploying an enabled site still fail the run.
+It runs no crawler or private imports. The catalog URL is
 [rharriszzz.github.io/github-pages-discovery](https://rharriszzz.github.io/github-pages-discovery/)
 after a successful deployment. To configure a fork, choose **GitHub Actions** in
 **Settings → Pages → Build and deployment → Source**.
+
+After enabling Pages, run **Validate catalog and optional Pages** from the
+repository's Actions tab, or push a new commit to `main`. Hosting from a private
+repository requires an eligible GitHub plan; enabling Pages does not change
+repository visibility. See [GitHub Pages availability](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
 
 The Pages site is public: avoid committing anything you consider private. The shipped interest profile describes research topics and is editable; it contains no API tokens, private messages or personal contact details.
 

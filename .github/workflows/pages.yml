@@ -1,27 +1,54 @@
-name: Publish catalog
+name: Validate catalog and optional Pages
 on:
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate:
     runs-on: ubuntu-latest
+    outputs:
+      pages_enabled: ${{ steps.pages.outputs.enabled }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - run: python -m pagefinder.publication
+      - name: Check whether Pages is enabled
+        id: pages
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { data: repository } = await github.rest.repos.get(context.repo);
+            if (typeof repository.has_pages !== 'boolean') {
+              throw new Error('GitHub did not return the Pages configuration status.');
+            }
+            core.setOutput('enabled', repository.has_pages);
+            if (!repository.has_pages) {
+              core.notice('Catalog validated. Pages is disabled, so publishing is skipped.');
+              await core.summary
+                .addHeading('Catalog validated; publishing is disabled')
+                .addRaw('No website was published. To enable publishing, choose GitHub Actions in Settings → Pages, then run this workflow again.')
+                .write();
+            }
+  deploy:
+    needs: validate
+    if: needs.validate.outputs.pages_enabled == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
