@@ -25,3 +25,10 @@ creator_seeds.json
 creator_source_coverage.json
 creator_research_report.md
 creator-feedback*.json
+
+# Work-level learning indexes and research remain in private local storage.
+learning_coverage.json
+learning_query_examples.json
+learning_research_report.md
+learning-feedback*.json
+learning-research*/

@@ -111,6 +111,22 @@ Code: [YouTube client and authentication](pagefinder/youtube.py),
 [bounded creator sources](pagefinder/creator_sources.py) and
 [research manifest imports](pagefinder/creators.py).
 
+## Learning Queue and the arXiv Shelf bridge
+
+The [Learning Queue](guides/learning-queue.md) adds a work-level index and
+independent feedback tables to the existing private SQLite store. Its read-only
+[adapter](pagefinder/arxiv_adapter.py) merges Shelf's append-only catalog events
+with the same alias and star-rating semantics, without executing Shelf's scanner
+or writing to its repository. Source metadata, curated learning notes and
+source-linked concept bridges feed transparent local text retrieval.
+
+The interface reuses Python, vanilla HTML/CSS/JavaScript and shared loopback HTTP
+protections. Its normal refresh reads local files only; no vector database,
+external model API, additional OAuth scope or hosted backend is required.
+Code: [index and retrieval](pagefinder/learning.py),
+[server](pagefinder/learning_server.py) and
+[shared HTTP protections](pagefinder/private_server.py).
+
 ## Formats and recommendation methods
 
 JSON carries configuration, selected Chrome bookmarks, API responses, source

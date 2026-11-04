@@ -32,8 +32,9 @@ def _safe_error_message(exc):
                           'to bind a loopback socket when starting a local server.',
             errno.EPERM: 'Operation not permitted. Check sandbox restrictions and permissions '
                          'for private storage and local sockets.',
-            errno.EADDRINUSE: 'Local port is already in use. For serve-creators, choose another '
-                              '--port (for example, --port 8767), or stop the existing server.',
+            errno.EADDRINUSE: 'Local port is already in use. Choose another --port '
+                              '(for example, --port 8767 for serve-creators or --port 8768 '
+                              'for serve-learning), or stop the existing server.',
             errno.ENOENT: 'Required file or directory was not found. Check input paths '
                           'and setup instructions.',
             errno.ENOSPC: 'No space left on the device. Free space on the private storage device.',
@@ -104,6 +105,13 @@ def main(argv=None):
     feedback.add_argument('source')
     server = sub.add_parser('serve-creators', help='Serve private durable reviews on 127.0.0.1 only')
     server.add_argument('--port', type=int, default=8766)
+    learning = sub.add_parser('serve-learning', help='Serve the private work-level Learning Queue; refresh local sources without network')
+    learning.add_argument('--port', type=int, default=8767)
+    learning.add_argument('--arxiv-dir', help='Read-only arXiv Shelf working tree; remembered privately')
+    learning_refresh = sub.add_parser('refresh-learning', help='Refresh the work index from local sources only')
+    learning_refresh.add_argument('--arxiv-dir')
+    learning_research = sub.add_parser('import-learning-research', help='Import a private, source-linked assessed-work manifest')
+    learning_research.add_argument('source')
     scope = sub.add_parser('set-interest-scope', help='Persist an explicit private application constraint on a baseline topic')
     scope.add_argument('topic')
     scope.add_argument('--label', required=True)
@@ -203,6 +211,16 @@ def main(argv=None):
             store.close()
             store = None
             serve_creators(folder, args.port)
+        elif args.command == 'serve-learning':
+            from .learning_server import serve_learning
+            store.close()
+            store = None
+            serve_learning(folder, args.port, args.arxiv_dir)
+        elif args.command in ('refresh-learning', 'import-learning-research'):
+            from .learning import refresh, import_research
+            report = (import_research(store, args.source) if args.command == 'import-learning-research'
+                      else refresh(store, args.arxiv_dir))
+            print('Private Learning Queue:', report['index']['active_works'], 'works; no external requests.')
         elif args.command == 'set-interest-scope':
             set_interest_scope(store, args.topic, args.label, args.context,
                                project_status=args.project_status, note=args.note, mode=args.mode)

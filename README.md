@@ -2,10 +2,13 @@
 
 A research tool for discovering interesting GitHub Pages sites, YouTube creators,
 software projects and connections among technical and creative subjects. It
-combines a public site catalog with private local research and creator reviews.
+combines a public site catalog with private local research, creator reviews and a
+Learning Queue for choosing specific things to read, watch or try.
 
 **Current status:** The public catalog contains seven manually researched sample
-sites. The private creator dashboard supports 52 recommendations: the original
+sites. The private Learning Queue combines the local arXiv Shelf catalog with
+researched videos, articles and code, returning a small shortlist for a question.
+The creator dashboard supports 52 recommendations: the original
 twelve plus 40 from the expanded discovery round. It provides linked projects,
 videos, learning concepts, filters and saved feedback. Research is bounded and
 partly curated; recommendation usefulness and concept novelty require human
@@ -19,6 +22,7 @@ the reviewed public catalog and documentation.
 
 | Goal | Where to start |
 | --- | --- |
+| Choose something specific to learn next | [Learning Queue](#learning-queue) |
 | Browse or regenerate the public site catalog | [Quick start](#quick-start-python-311-standard-library-only) |
 | Review the existing creator recommendations | [Creator dashboard](#cross-platform-creator-experiment) |
 | Set up private YouTube research | [Private local research](#private-local-research) and [YouTube setup](docs/youtube_setup.md) |
@@ -133,6 +137,32 @@ Historical analysis, automated graph inference, calibrated ranking and lost-vide
 recommendations remain future work. See [implementation status](docs/implementation_status.md).
 
 **Data-boundary rule:** All private playlist inventories, Likes, viewing-history exports, user-specific evidence, credentials and OAuth tokens must be stored outside the Git repository. The published `docs/` site contains only reviewed public-safe data. Personal YouTube analysis belongs in a private local application, not on GitHub Pages. 
+
+## Learning Queue
+
+From this repository in WSL2, run:
+
+```bash
+python3 -m pagefinder.local serve-learning --port 8767
+```
+
+Open **http://127.0.0.1:8767/** in Windows Chrome. Enter a question, optionally
+choose a goal, time budget or format, and open one of the 3–5 supported suggestions.
+Save works for later, mark them useful or already read/watched, and keep notes.
+Opening a link does not mark it completed. The creator cards remain accessible
+through **Explore creators**.
+
+Startup automatically refreshes the index from local sources, with no network
+requests or additional authentication. The default Shelf path is `~/git/arxiv-shelf`;
+use `--arxiv-dir /path/to/arxiv-shelf` or `ARXIV_SHELF_DIR` for another location.
+The adapter reads the live append-only catalog and existing star ratings without
+writing to Shelf. Missing sources retain cached material and show a status message.
+
+The additional bounded research covers 18 works, with source-linked starting
+points, measured video durations and explicit limits. Personalized recommendations,
+collection data, research caches and feedback stay in the existing private data
+directory. See the [Learning Queue guide](guides/learning-queue.md) for configuration,
+research imports, feedback behavior and troubleshooting.
 
 ## Private local research
 

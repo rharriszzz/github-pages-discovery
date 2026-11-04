@@ -1,5 +1,39 @@
 # Implementation status — 2026-11-03
 
+## Practical private Learning Queue
+
+- Added a question-first Learning Queue on loopback port 8767. Optional goal,
+  time and format controls produce up to five specific source-linked works;
+  saved, useful, completed and dismissed views preserve independent feedback.
+- A read-only arXiv Shelf adapter mirrors live schema-1 catalog event ordering,
+  aliases, metadata and star-rating semantics. It agrees with the existing
+  `Catalog.read_state()` on the local collection. PDF availability is verified
+  separately; neither source membership nor a rating implies reading.
+- The work index combines the existing creator collection, retained video
+  descriptions, cited concepts, earlier project README excerpts and selected
+  bookmarks. Refresh is local/offline, idempotent and retains cached partitions
+  when a source is missing or malformed. Existing creator reviews remain intact.
+- Independently revisited 18 works: five videos, six code resources, three
+  technical articles and four collected papers. Actual sources, ranked example
+  results, evidence and limitations are private. Five representative questions
+  return mixed-source shortlists without requiring a paper for every question.
+- Specific query anchors and documented method bridges avoid an observed generic
+  keyword failure. Separate fit/evidence/effort facets remain inspectable; these
+  checks do not establish improved human usefulness or unfamiliarity.
+- Research usage: one YouTube metadata request, eleven logical GitHub connector
+  calls (one unsuccessful branch guess), and four web-tool calls containing
+  eighteen opens/clicks. One failed full-text route was resolved through an
+  official page. No candidate code ran and no full video was watched.
+- **112 tests pass**, including adapter semantics, refresh/fallback, retrieval,
+  independent feedback, private-data boundaries, socket protections and useful
+  startup/storage errors. Chromium desktop/narrow-width checks cover real queries
+  and synthetic save/reload; Windows-to-WSL localhost access returns HTTP 200.
+  Shelf files and existing reviews are unchanged; the public catalog is preserved.
+
+Launch: `python3 -m pagefinder.local serve-learning --port 8767`, then open
+`http://127.0.0.1:8767/` in Windows Chrome. No separate import/rebuild is required
+on normal startup. See the [Learning Queue guide](../guides/learning-queue.md).
+
 ## Expanded creator discovery checkpoint
 
 - Screened 150 new YouTube-first channels and 51 new GitHub-first canonical
