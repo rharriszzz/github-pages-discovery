@@ -1,5 +1,7 @@
 # GitHub Pages Interest Finder
 
+**Next design priority (2026-11-07):** [Discovery UI and Suggestion Concepts](docs/DISCOVERY_UI_AND_SUGGESTION_CONCEPTS.md) collects the user's explicit preferences, outside inspirations and proposed combined Browse/Investigate interfaces. **No large discovery crawl is planned next**; the existing Learning Queue and research collection are the material for UI design.
+
 A research tool for discovering interesting GitHub Pages sites, YouTube creators,
 software projects and connections among technical and creative subjects. It
 combines a public site catalog with private local research, creator reviews and a
