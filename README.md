@@ -1,6 +1,11 @@
 # GitHub Pages Interest Finder
 
-**Next design priority (2026-11-07):** [Discovery UI and Suggestion Concepts](docs/DISCOVERY_UI_AND_SUGGESTION_CONCEPTS.md) collects the user's explicit preferences, outside inspirations and proposed combined Browse/Investigate interfaces. **No large discovery crawl is planned next**; the existing Learning Queue and research collection are the material for UI design.
+## Current design and supporting research
+
+- **[Discovery UI and Suggestion Concepts](docs/DISCOVERY_UI_AND_SUGGESTION_CONCEPTS.md)** — the **working design document**. It distinguishes the user's stated preferences, ideas suggested by others, and proposed features still to evaluate. Use this first when deciding what to build.
+- **[Learning Discovery Next Steps (2026-11-07)](docs/LEARNING_DISCOVERY_NEXT_STEPS_2026-11-07.md)** — the **supporting research notebook**. It preserves the detailed review of HackerTube and Tristan Hume's recommendations, candidate channels/videos, and earlier implementation possibilities. Use it for examples, sources, and background rather than as the current implementation priority.
+
+**Current priority:** combine and refine the best UI and suggestion features using material already collected, not a large new crawl.
 
 A research tool for discovering interesting GitHub Pages sites, YouTube creators,
 software projects and connections among technical and creative subjects. It
