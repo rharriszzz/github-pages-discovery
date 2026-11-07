@@ -1,5 +1,7 @@
 # Making the Learning Queue genuinely useful — trial plan and research leads
 
+> **Updated priority (2026-11-07):** The user's newer direction is [Discovery UI and Suggestion Concepts](DISCOVERY_UI_AND_SUGGESTION_CONCEPTS.md): first combine the best presentation and suggestion features, complement existing YouTube/Chrome habits, and **do not start a large crawl**. This older document remains a research and example-video reference; its acquisition phases are deferred.
+
 *Prepared 2026-11-07. Public-safe design/research notes for rharriszzz/github-pages-discovery; related project: [arxiv-shelf](https://github.com/rharriszzz/arxiv-shelf).*
 
 ## 0. Recommendation in one paragraph
