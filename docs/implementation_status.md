@@ -1,4 +1,4 @@
-# Implementation status — 2026-11-03
+# Implementation status — updated 2026-11-07
 
 ## Practical private Learning Queue
 
@@ -194,19 +194,23 @@ The sections below preserve earlier implementation checkpoints and denominators.
 - Guarded public input/export contracts, artifact allowlist and CI/deployment
   checks. Public deployment does not run any personal importer.
 
-## Validation and denominators
+## Validation and test coverage
 
-The original infrastructure checkpoint passed 43 standard-library tests on
-Python 3.14.4, including the original six. The bookmark extension below raises
-that checkpoint's total to 52 passing tests. The bookshelf extension below raises
-that checkpoint's total to 63 passing tests. The current checkpoint above has
-69 passing tests.
-At that historical checkpoint, CI used Python 3.11; that interpreter was unavailable locally.
-The current CI configuration tests Python 3.14 and 3.15, while Pages validation
-uses Python 3.15. This updates the recommended environment, not the historical result.
-OAuth SDK invocation is tested with a synthetic mock against its documented
-signature; optional OAuth libraries were not installed in the base interpreter.
-No live browser sign-in, token refresh or Windows-to-WSL callback is claimed.
+**Latest verified automated checks (November 7, 2026):** GitHub Actions ran
+**112 tests successfully on Python 3.14 and 112 on Python 3.15**. Both jobs
+also regenerated the public report, checked that the committed HTML/CSV/JSON
+outputs were unchanged, and passed the public-input/publication safety guards.
+The separate Pages workflow validated the catalog on Python 3.15 and deployed
+successfully. See the [successful unit-test run](https://github.com/rharriszzz/github-pages-discovery/actions/runs/42428478165)
+and [Pages validation/deployment run](https://github.com/rharriszzz/github-pages-discovery/actions/runs/42428478229)
+(commit `909dba6`). For results after that commit, consult
+[GitHub Actions](https://github.com/rharriszzz/github-pages-discovery/actions).
+
+The tests use standard-library tooling and synthetic fixtures. OAuth SDK
+invocation is checked with mocks, not an actual live Google account; successful
+CI does not establish browser sign-in, token refresh, or WSL2 callback behavior
+in an individual installation. Optional live-YouTube packages must be installed
+separately following [YouTube setup](youtube_setup.md).
 
 - Synthetic inventory: two API page fixtures, three distinct playlists spanning
   private/unlisted/public, one repeated ID and a title change. Counts include a
