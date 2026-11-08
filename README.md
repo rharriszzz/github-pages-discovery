@@ -30,7 +30,7 @@ the reviewed public catalog and documentation.
 | Goal | Where to start |
 | --- | --- |
 | Choose something specific to learn next | [Learning Queue](#learning-queue) |
-| Browse or regenerate the public site catalog | [Quick start](#quick-start-python-311-standard-library-only) |
+| Browse or regenerate the public site catalog | [Quick start](#quick-start) |
 | Review the existing creator recommendations | [Creator dashboard](#cross-platform-creator-experiment) |
 | Set up private YouTube research | [Private local research](#private-local-research) and [YouTube setup](docs/youtube_setup.md) |
 | Understand the technology choices | [Major technologies](TECHNOLOGIES.md) |
@@ -49,17 +49,28 @@ claim a fresh automated HTTP check.
 - Export a static, searchable report in `docs/index.html`, plus `reports/results.csv` and `reports/results.json`.
 - Stop cleanly when API rate limits are encountered; save checkpoints instead of increasing request rates or rotating credentials/IP addresses.
 
-## Quick start (Python 3.11+, standard library only)
+## Quick start
+
+Use **Python 3.15** (recommended) or **Python 3.14**, the two stable releases
+receiving regular bug fixes as of November 2026. Versions 3.11–3.13 receive
+security fixes only, and 3.10 has reached end of life. The code may still run
+on older interpreters, but they are not the recommended or CI-tested setup.
+See the [Python setup guide](docs/python_setup.md) for WSL2, Linux, macOS and
+Windows; in particular, **do not replace Ubuntu's system Python**. The commands
+below assume `python3` selects a 3.14/3.15 interpreter, typically from an
+activated project virtual environment.
 
 ```bash
+python3 --version  # Expect Python 3.15.x or 3.14.x
 python3 -m pagefinder stats
 python3 -m pagefinder report
 # Open docs/index.html in a browser.
 ```
 
-Run these commands from the repository directory. They use Python 3.11 or newer,
-require no third-party packages and do not access the network. For the private
-review interface, see the [creator dashboard](#cross-platform-creator-experiment).
+Run these commands from the repository directory. The public catalog uses
+only the Python standard library, needs no third-party packages and does not
+access the network for these commands. For the private review interface,
+see the [creator dashboard](#cross-platform-creator-experiment).
 
 To check the implementation and public export boundary:
 

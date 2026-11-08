@@ -218,33 +218,39 @@ your terminal has returned to this repository.
 
 ## 7. Prepare the Python environment in WSL
 
-From the repository directory, run these commands one at a time:
+Use a Python version receiving regular bug fixes: **3.15** (recommended) or
+**3.14**. Ubuntu's default `python3` may be older, so do **not** assume that
+`python3 -m venv` will select a maintained version. Do not replace or remove
+Ubuntu's system Python.
+
+If needed, install `uv` using the [Python setup guide](python_setup.md), which
+also explains how to use an already-installed 3.14/3.15 interpreter. Then,
+from the repository directory, run these commands one at a time:
 
 ```bash
-python3 -m venv .venv
+uv python install 3.15
+uv venv --seed --python 3.15 .venv
+.venv/bin/python --version  # Expect Python 3.15.x
 .venv/bin/python -m pip install -r requirements-youtube.txt
 .venv/bin/python -m pagefinder.local init
 ```
 
-The first creates a local Python environment. The second installs Google's
-authentication libraries and their dependencies into it. The third creates the
-private research database. Using `.venv/bin/python` explicitly avoids needing to
-learn environment activation commands.
+The first two commands download/select a current Python and create a project
+environment with `pip`, without changing Ubuntu's system interpreter. The next
+two install Google's authentication libraries and initialize the private
+research database. Using `.venv/bin/python` explicitly means you need not
+activate the environment. To use Python 3.14 instead, substitute `3.14` in
+the first two commands.
 
-If the first command says `ensurepip` or `venv` is unavailable on Ubuntu, install
-the missing package, then repeat the commands:
+If you already have Python 3.15 installed, `python3.15 -m venv .venv` is an
+alternative to the first two `uv` commands. If that fails because `venv` or
+`ensurepip` is unavailable, use `uv` as above or install the matching
+version-specific `python3.15-venv` package if your distribution provides it;
+installing generic `python3-venv` on an older Ubuntu may only support its
+older system Python.
 
-```bash
-sudo apt update
-sudo apt install python3-venv
-```
-
-`sudo` may ask for your **Linux** password; typing it normally shows no characters.
-This is unrelated to your Google password. If Ubuntu names a version-specific
-venv package in its error, use that package name instead.
-
-**Checkpoint:** `init` reports a private SQLite location outside Git. Installing
-libraries and initializing storage do not fetch your playlists.
+**Checkpoint:** `init` reports a private SQLite location outside Git.
+Installing libraries and initializing storage do not fetch your playlists.
 
 ## 8. Authorize the program in Windows Chrome
 

@@ -14,14 +14,14 @@ jobs:
     outputs:
       pages_enabled: ${{ steps.pages.outputs.enabled }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
-          python-version: '3.11'
+          python-version: '3.15'
       - run: python -m pagefinder.publication
       - name: Check whether Pages is enabled
         id: pages
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: repository } = await github.rest.repos.get(context.repo);
@@ -48,10 +48,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: docs
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

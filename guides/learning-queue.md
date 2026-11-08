@@ -2,7 +2,9 @@
 
 The Learning Queue answers “What should I read, watch or try next?” using specific
 works from the local arXiv Shelf catalog and the existing private Discovery research.
-It runs locally with Python 3.11+ and the standard library.
+It runs locally with Python 3.15 (recommended) or 3.14 and the standard library.
+Follow the [Python setup guide](../docs/python_setup.md) and check that
+`python3 --version` reports one of these releases before running commands.
 
 ## Launch from WSL2
 

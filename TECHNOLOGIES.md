@@ -8,7 +8,7 @@ Python standard library; live YouTube authentication adds optional dependencies.
 
 | Technology | Role in this project | Required when |
 | --- | --- | --- |
-| Python 3.11+ | Commands, imports, discovery, validation and report generation | Running the application |
+| Python 3.15 (recommended), or 3.14 | Commands, imports, discovery, validation and report generation | Running the application |
 | SQLite | Private evidence, concepts, reviews, checkpoints and HTTP request accounting | Private research and cached network work |
 | HTML, CSS and JavaScript | Searchable reports and the interactive creator dashboard | Browsing reports |
 | GitHub REST API | Public repository discovery and account metadata | Live GitHub discovery |
@@ -16,6 +16,11 @@ Python standard library; live YouTube authentication adds optional dependencies.
 | OAuth 2.0 and Google authentication libraries | Read-only account authorization and authenticated requests | Connecting a YouTube account |
 | JSON, CSV and Markdown | Structured inputs, source snapshots, exports and research documentation | Data exchange and reporting |
 | Git, GitHub Actions and GitHub Pages | Version control, automated checks and public static hosting | Collaboration and publication |
+
+For installation and interpreter selection, especially on Ubuntu/WSL2, see
+[Python setup](docs/python_setup.md). These are the stable branches still
+receiving regular bug fixes in November 2026; older branches may receive
+security fixes but are not the recommended development environment.
 
 ## Python and the command-line application
 

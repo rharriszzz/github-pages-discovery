@@ -5,11 +5,16 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.14', '3.15']
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
+      - run: python -VV
       - run: python -m unittest discover -s tests -v
       - run: python -m pagefinder report
       - run: python -m pagefinder.publication

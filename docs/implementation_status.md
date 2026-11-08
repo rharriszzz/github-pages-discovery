@@ -201,7 +201,9 @@ Python 3.14.4, including the original six. The bookmark extension below raises
 that checkpoint's total to 52 passing tests. The bookshelf extension below raises
 that checkpoint's total to 63 passing tests. The current checkpoint above has
 69 passing tests.
-The CI workflow uses Python 3.11; that interpreter was unavailable locally.
+At that historical checkpoint, CI used Python 3.11; that interpreter was unavailable locally.
+The current CI configuration tests Python 3.14 and 3.15, while Pages validation
+uses Python 3.15. This updates the recommended environment, not the historical result.
 OAuth SDK invocation is tested with a synthetic mock against its documented
 signature; optional OAuth libraries were not installed in the base interpreter.
 No live browser sign-in, token refresh or Windows-to-WSL callback is claimed.
