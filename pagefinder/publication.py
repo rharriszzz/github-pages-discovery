@@ -10,7 +10,17 @@ from .core import ROOT, safe_site
 SITE_FIELDS = frozenset(('url', 'owner', 'account_type', 'account_type_source', 'repository',
                          'repo_url', 'repo_description', 'topics', 'language', 'stars', 'updated_at',
                          'source', 'site_status', 'title', 'summary', 'body', 'review'))
-PUBLIC_DOCS = frozenset(('index.html', 'architecture.md', 'implementation_status.md', 'youtube_setup.md'))
+# Explicitly reviewed, public-safe documentation. New docs must be assessed and
+# added here before GitHub Pages can publish them; the guard remains fail-closed.
+PUBLIC_DOCS = frozenset((
+    'index.html',
+    'architecture.md',
+    'implementation_status.md',
+    'youtube_setup.md',
+    'DISCOVERY_UI_AND_SUGGESTION_CONCEPTS.md',
+    'LEARNING_DISCOVERY_NEXT_STEPS_2026-11-07.md',
+    'python_setup.md',
+))
 SECRET_PATTERNS = (
     re.compile(r'\b(?:ya29\.|1//|ghp_|github_pat_)[A-Za-z0-9_.-]{12,}'),
     re.compile(r'AIza[A-Za-z0-9_-]{30,}'),
